@@ -3,114 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>T-order Hub - Multi-Session Edition</title>
-    <link id="manifest-link" rel="manifest" href="">
+    <title>T-order Hub - Optimized Grid</title>
     <meta name="theme-color" content="#800020">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&family=JetBrains+Mono:wght@500&display=swap');
-
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&family=JetBrains+Mono:wght@500&display=swap%27);
+ 
+        :root {
+            --brand-color: #800020;
+        }
+ 
         body {
             background-color: #0f172a;
             font-family: 'Noto Sans KR', sans-serif;
+            margin: 0;
             display: flex;
             justify-content: center;
-            align-items: center;
             min-height: 100vh;
-            margin: 0;
-            overflow: auto;
         }
-
+ 
         #app-shell {
-            width: 2200px;
-            height: 1200px;
+            width: 100%;
+            max-width: 1800px; /* 더 넓은 화면을 수용하기 위해 최대폭 확장 */
             background-color: #f8fafc;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.5);
-            border-radius: 60px;
-            border: 16px solid #1e293b;
             display: flex;
             flex-direction: column;
-            /* 프리뷰 배율 상향 (크게 보기) */
-            transform: scale(0.85); 
-            transform-origin: center center;
-            flex-shrink: 0;
+            min-height: 100vh;
+            position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
-
-        @media (max-width: 1800px) { #app-shell { transform: scale(0.7); } }
-        @media (max-width: 1400px) { #app-shell { transform: scale(0.5); } }
-        @media (max-width: 1000px) { #app-shell { transform: scale(0.35); } }
-
+ 
         .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+ 
         .store-img { transition: transform 0.5s ease; }
         .store-card:hover .store-img { transform: scale(1.05); }
-
-        #iframe-container { flex: 1; width: 100%; display: none; background-color: #fff; }
-        #content-iframe { width: 100%; height: 100%; border: none; }
-        #digital-clock { font-family: 'JetBrains Mono', monospace; }
-
-        .admin-glow { box-shadow: 0 0 20px rgba(231, 76, 60, 0.2); border: 2px solid #e74c3c !important; }
+ 
+        #iframe-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 50;
+            display: none;
+            background-color: #fff;
+            flex-direction: column;
+        }
+        
+        #content-iframe { flex: 1; width: 100%; border: none; }
+ 
+        .admin-glow { box-shadow: 0 0 15px rgba(231, 76, 60, 0.4); border: 2px solid #e74c3c !important; }
         
         .status-open { background-color: #22c55e; color: white; }
         .status-break { background-color: #f59e0b; color: white; }
         .status-closed { background-color: #ef4444; color: white; }
         .status-off { background-color: #64748b; color: white; }
-
-        .day-tab { padding: 8px 12px; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; transition: 0.2s; border: 1px solid #ddd; }
-        .day-tab.active { background-color: #800020; color: white; border-color: #800020; }
+ 
+        .day-tab { padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; transition: 0.2s; border: 1px solid #ddd; white-space: nowrap; }
+        .day-tab.active { background-color: var(--brand-color); color: white; border-color: var(--brand-color); }
+ 
+        #digital-clock { font-family: 'JetBrains Mono', monospace; }
+        
+        @media (max-width: 640px) {
+            #clock-time { font-size: 1.25rem !important; }
+            #clock-date { font-size: 0.75rem !important; }
+            .store-card h3 { font-size: 1.1rem !important; }
+        }
     </style>
 </head>
 <body>
-
+ 
 <div id="app-shell">
-    <header class="h-32 bg-white flex items-center justify-between px-12 border-b border-gray-200 z-10 shrink-0 relative shadow-sm">
-        <div class="flex items-center gap-6">
-            <button id="back-btn" class="hidden text-white font-bold flex items-center px-6 py-3 bg-[#800020] rounded-2xl hover:opacity-90 transition-all" onclick="goBack()">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
-                <span class="text-xl">Back</span>
-            </button>
-            <h1 id="app-title" class="text-4xl font-extrabold text-gray-800 tracking-tight cursor-pointer" onclick="checkAdmin()">Grand Hyatt Jeju</h1>
+    <!-- Header -->
+    <header class="sticky top-0 h-20 md:h-24 bg-white flex items-center justify-between px-4 md:px-8 border-b border-gray-200 z-30 shrink-0 shadow-sm">
+        <div class="flex items-center gap-3">
+            <h1 id="main-title" class="text-lg md:text-2xl font-extrabold text-gray-800 tracking-tight">
+                Grand Hyatt Jeju
+            </h1>
         </div>
-
+ 
         <div id="digital-clock" class="text-right">
-            <div id="clock-date" class="text-xl font-medium text-gray-500">0000년 00월 00일 (요일)</div>
-            <div id="clock-time" class="text-5xl font-bold text-gray-800 tabular-nums">00:00:00</div>
+            <div id="clock-date" class="text-[10px] md:text-xs font-medium text-gray-400">0000.00.00 (요일)</div>
+            <div id="clock-time" class="text-lg md:text-2xl font-bold text-gray-800 tabular-nums leading-none">00:00:00</div>
         </div>
-
-        <div class="flex items-center gap-4">
-            <button id="edit-toggle" class="hidden px-6 py-3 bg-slate-800 text-white font-bold rounded-2xl text-xl hover:bg-slate-700" onclick="toggleEditMode()">🛠️ Edit</button>
-            <button id="admin-lock-btn" class="px-4 py-3 bg-gray-100 text-gray-400 rounded-2xl hover:bg-gray-200 transition-all" onclick="unlockAdmin()">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+ 
+        <div class="flex items-center gap-2">
+            <button id="edit-toggle" class="hidden px-3 py-1.5 bg-slate-800 text-white text-[10px] md:text-xs font-bold rounded-lg hover:bg-slate-700" onclick="toggleEditMode()">🛠️ 수정</button>
+            <button id="admin-lock-btn" class="p-2 md:p-2.5 bg-gray-100 text-gray-400 rounded-lg hover:bg-gray-200 transition-all" onclick="unlockAdmin()">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
             </button>
         </div>
     </header>
-
-    <main id="menu-screen" class="flex-1 overflow-y-auto bg-[#f1f5f9] p-12 hide-scrollbar">
-        <div id="store-grid" class="grid grid-cols-3 gap-10"></div>
+ 
+    <!-- Main Content: 반응형 그리드 설정 -->
+    <main id="menu-screen" class="flex-1 overflow-y-auto bg-slate-100 p-3 md:p-6 hide-scrollbar">
+        <div id="store-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-5 max-w-full mx-auto">
+            <!-- Stores dynamically rendered here -->
+        </div>
     </main>
-
-    <div id="iframe-container"><iframe id="content-iframe" src=""></iframe></div>
-</div>
-
-<div id="pwd-modal" class="hidden fixed inset-0 bg-black/60 z-[100] flex items-center justify-center">
-    <div class="bg-white p-10 rounded-[30px] shadow-2xl text-center w-[500px]">
-        <h3 class="text-3xl font-bold mb-6">관리자 인증</h3>
-        <input type="password" id="admin-pwd" class="w-full p-4 border-2 border-gray-200 rounded-xl text-2xl text-center outline-none focus:border-[#800020]" placeholder="비밀번호 입력">
-        <div class="flex gap-4 mt-8"><button class="flex-1 py-4 bg-gray-200 rounded-xl text-xl font-bold" onclick="closePwdModal()">취소</button><button class="flex-1 py-4 bg-[#800020] text-white rounded-xl text-xl font-bold" onclick="verifyAdmin()">확인</button></div>
+ 
+    <!-- Iframe Viewer Overlay -->
+    <div id="iframe-container">
+        <div class="h-14 bg-white border-b flex items-center justify-between px-4 shrink-0 shadow-sm">
+            <button class="flex items-center gap-2 px-3 py-1.5 bg-[#800020] text-white rounded-lg font-bold text-sm" onclick="goBack()">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                </svg>
+                뒤로가기
+            </button>
+            <span id="viewer-title" class="font-bold text-gray-700 truncate text-sm">Menu</span>
+            <div class="w-20"></div>
+        </div>
+        <iframe id="content-iframe" src=""></iframe>
     </div>
 </div>
-
+ 
+<!-- Admin Password Modal -->
+<div id="pwd-modal" class="hidden fixed inset-0 bg-black/70 z-[100] flex items-center justify-center p-4">
+    <div class="bg-white p-6 md:p-8 rounded-2xl shadow-2xl text-center w-full max-w-xs">
+        <h3 class="text-xl font-bold mb-4 text-gray-800">관리자 인증</h3>
+        <input type="password" id="admin-pwd" class="w-full p-3 border-2 border-gray-100 rounded-xl text-xl text-center outline-none focus:border-[#800020] bg-gray-50 mb-4" placeholder="PIN 번호">
+        <div class="flex gap-2">
+            <button class="flex-1 py-3 bg-gray-200 rounded-xl font-bold text-gray-600 text-sm" onclick="closePwdModal()">취소</button>
+            <button class="flex-1 py-3 bg-[#800020] text-white rounded-xl font-bold text-sm" onclick="verifyAdmin()">확인</button>
+        </div>
+    </div>
+</div>
+ 
 <script>
     const ADMIN_PASSWORD = '1234';
     const weekDays = ['일', '월', '화', '수', '목', '금', '토'];
-
+ 
     const createWeeklyTemplate = () => {
         let template = {};
         weekDays.forEach((_, i) => {
-            template[i] = { 
+            template[i] = {
                 isOff: false,
                 sessions: [
                     { label: "1차", open: "09:00", close: "14:00" },
@@ -121,153 +149,142 @@
         });
         return template;
     };
-
+ 
     const defaultStores = [
-        { id: 1, name: "Gallery Lounge", url: "https://edit.istay.io/viewer/index.html?site=fbgal#/ko/store/984d8fc9-d58a-4bcf-aed8-1d803a1b32ed/3790ozmo", img: "https://i.postimg.cc/TwbM4V0Y/launji-38.jpg", weekly: createWeeklyTemplate() },
-        { id: 2, name: "99Valley", url: "https://edit.istay.io/viewer/index.html?site=fb99v#/ko/store/e1635994-e41a-46ca-99bd-08895789001c/7734hio1", img: "https://i.postimg.cc/q7c4BfWJ/99-Valley.jpg", weekly: createWeeklyTemplate() },
-        { id: 3, name: "Noknamu", url: "https://edit.istay.io/viewer/index.html?site=fbnox#/ko/store/3c677ff1-c1c5-4574-8d60-048496ea1cfa/8481tevr", img: "https://i.postimg.cc/XJXHHdfg/nognamu.jpg", weekly: createWeeklyTemplate() },
-        { id: 4, name: "China House", url: "https://edit.istay.io/viewer/index.html?site=fbchh#/ko/store/c46b6223-3bec-4fdc-99af-c528378cda08/3295bslj", img: "https://i.postimg.cc/263cchQt/chaina-hauseu.jpg", weekly: createWeeklyTemplate() },
-        { id: 5, name: "Jeju Hotpot", url: "https://edit.istay.io/viewer/index.html?site=fbpot#/ko/store/1158ec0a-7ecf-4a5c-a487-1771f53f3502/483150kk", img: "https://i.postimg.cc/B6tYYHTd/haspas.jpg", weekly: createWeeklyTemplate() },
-        { id: 6, name: "Yumeyama", url: "https://edit.istay.io/viewer/index.html?site=fbyum#/ko/store/d3a3203c-c733-49e0-a395-7109edb5c528/7560zc5b", img: "https://i.postimg.cc/76bss03W/yumeyama.jpg", weekly: createWeeklyTemplate() },
-        { id: 7, name: "The 88", url: "https://edit.istay.io/viewer/index.html?site=fbcaf#/ko/store/c11f69b7-2b3f-44d8-a767-938340977a33/1265f4rr", img: "https://i.postimg.cc/LsxQ3N1y/deo-88.jpg", weekly: createWeeklyTemplate() },
-        { id: 8, name: "The 88 Terrace", url: "https://edit.istay.io/viewer/index.html?site=fbcaf#/ko/store/c88f0b25-462a-470d-a86e-52c3a2f1fac0/6704y042", img: "https://i.postimg.cc/k5TYvfbf/deo-88-telaseu.jpg", weekly: createWeeklyTemplate() },
-        { id: 9, name: "Lounge 38", url: "https://edit.istay.io/viewer/index.html?site=fbl38#/ko/store/2db5dc63-bd21-4244-8892-fb3eca8f5e8d/4809kmhi", img: "https://i.postimg.cc/TwbM4V0Y/launji-38.jpg", weekly: createWeeklyTemplate() },
-        { id: 10, name: "Blue Dragon", url: "https://edit.istay.io/viewer/index.html?site=fbbdg#/ko/store/ef3b1278-b47c-49e6-aa8b-d2ca2746c32c/86042d2h", img: "https://i.postimg.cc/9Mz88Zd8/beulludeulaegon.jpg", weekly: createWeeklyTemplate() },
-        { id: 11, name: "Pocha", url: "https://edit.istay.io/viewer/index.html?site=fbcha#/ko/store/85ac8f34-f6af-4e1a-9561-10c277c8e7e1/5699dovg", img: "https://i.postimg.cc/vBDqqfrj/pocha.jpg", weekly: createWeeklyTemplate() },
+        { id: 1, name: "Gallery Lounge", url: "https://edit.istay.io/viewer/index.html?site=fbgal#/ko/store/984d8fc9-d58a-4bcf-aed8-1d803a1b32ed/3790ozmo%22, img: "https://i.postimg.cc/TwbM4V0Y/launji-38.jpg", weekly: createWeeklyTemplate() },
+        { id: 2, name: "99Valley", url: "https://edit.istay.io/viewer/index.html?site=fb99v#/ko/store/e1635994-e41a-46ca-99bd-08895789001c/7734hio1%22, img: "https://i.postimg.cc/q7c4BfWJ/99-Valley.jpg", weekly: createWeeklyTemplate() },
+        { id: 3, name: "Noknamu", url: "https://edit.istay.io/viewer/index.html?site=fbnox#/ko/store/3c677ff1-c1c5-4574-8d60-048496ea1cfa/8481tevr%22, img: "https://i.postimg.cc/XJXHHdfg/nognamu.jpg", weekly: createWeeklyTemplate() },
+        { id: 4, name: "China House", url: "https://edit.istay.io/viewer/index.html?site=fbchh#/ko/store/c46b6223-3bec-4fdc-99af-c528378cda08/3295bslj%22, img: "https://i.postimg.cc/263cchQt/chaina-hauseu.jpg", weekly: createWeeklyTemplate() },
+        { id: 5, name: "Jeju Hotpot", url: "https://edit.istay.io/viewer/index.html?site=fbpot#/ko/store/1158ec0a-7ecf-4a5c-a487-1771f53f3502/483150kk%22, img: "https://i.postimg.cc/B6tYYHTd/haspas.jpg", weekly: createWeeklyTemplate() },
+        { id: 6, name: "Yumeyama", url: "https://edit.istay.io/viewer/index.html?site=fbyum#/ko/store/d3a3203c-c733-49e0-a395-7109edb5c528/7560zc5b%22, img: "https://i.postimg.cc/76bss03W/yumeyama.jpg", weekly: createWeeklyTemplate() },
+        { id: 7, name: "The 88", url: "https://edit.istay.io/viewer/index.html?site=fbcaf#/ko/store/c11f69b7-2b3f-44d8-a767-938340977a33/1265f4rr%22, img: "https://i.postimg.cc/LsxQ3N1y/deo-88.jpg", weekly: createWeeklyTemplate() },
+        { id: 8, name: "The 88 Terrace", url: "https://edit.istay.io/viewer/index.html?site=fbcaf#/ko/store/c88f0b25-462a-470d-a86e-52c3a2f1fac0/6704y042%22, img: "https://i.postimg.cc/k5TYvfbf/deo-88-telaseu.jpg", weekly: createWeeklyTemplate() },
+        { id: 9, name: "Lounge 38", url: "https://edit.istay.io/viewer/index.html?site=fbl38#/ko/store/2db5dc63-bd21-4244-8892-fb3eca8f5e8d/4809kmhi%22, img: "https://i.postimg.cc/TwbM4V0Y/launji-38.jpg", weekly: createWeeklyTemplate() },
+        { id: 10, name: "Blue Dragon", url: "https://edit.istay.io/viewer/index.html?site=fbbdg#/ko/store/ef3b1278-b47c-49e6-aa8b-d2ca2746c32c/86042d2h%22, img: "https://i.postimg.cc/9Mz88Zd8/beulludeulaegon.jpg", weekly: createWeeklyTemplate() },
+        { id: 11, name: "Pocha", url: "https://edit.istay.io/viewer/index.html?site=fbcha#/ko/store/85ac8f34-f6af-4e1a-9561-10c277c8e7e1/5699dovg%22, img: "https://i.postimg.cc/vBDqqfrj/pocha.jpg", weekly: createWeeklyTemplate() },
         { id: 12, name: "Grand Kitchen", url: "https://www.jejudreamtower.com/upload/file/fileresource/966/17477.pdf", img: "https://i.postimg.cc/MG93mdQt/geulaendeu-kichin.jpg", weekly: createWeeklyTemplate() },
-		{ id: 13, name: "Deli", url: "https://www.jejudreamtower.com/upload/file/fileresource/960/17524.pdf", img: "https://i.postimg.cc/Kz4qqBPD/delli.jpg", weekly: createWeeklyTemplate() }
+        { id: 13, name: "Deli", url: "https://www.jejudreamtower.com/upload/file/fileresource/960/17524.pdf", img: "https://i.postimg.cc/Kz4qqBPD/delli.jpg", weekly: createWeeklyTemplate() }
     ];
-
+ 
     let stores = [];
     let isAdmin = false;
     let isEditMode = false;
     let editingDay = new Date().getDay();
-
+ 
     function startClock() {
         const dateEl = document.getElementById('clock-date');
         const timeEl = document.getElementById('clock-time');
         setInterval(() => {
             const now = new Date();
-            dateEl.innerText = `${now.getFullYear()}년 ${String(now.getMonth() + 1).padStart(2, '0')}월 ${String(now.getDate()).padStart(2, '0')}일 (${weekDays[now.getDay()]})`;
+            dateEl.innerText = `${now.getFullYear()}. ${String(now.getMonth() + 1).padStart(2, '0')}. ${String(now.getDate()).padStart(2, '0')}. (${weekDays[now.getDay()]})`;
             timeEl.innerText = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
-            if (now.getSeconds() === 0) render(); 
+            if (now.getSeconds() === 0) render();
         }, 1000);
     }
-
+ 
     function timeToMin(timeStr) {
+        if(!timeStr || !timeStr.includes(':')) return 0;
         const [h, m] = timeStr.split(':').map(Number);
         return h * 60 + m;
     }
-
+ 
     function getBusinessStatus(store) {
         const now = new Date();
         const curDay = now.getDay();
         const curMin = now.getHours() * 60 + now.getMinutes();
         const sched = store.weekly[curDay];
-
-        if (sched.isOff) return { label: "정기 휴무", class: "status-off", next: "내일 영업시간 확인" };
-
+ 
+        if (sched.isOff) return { label: "정기 휴무", class: "status-off", next: "내일 확인" };
+ 
         const sessions = sched.sessions
             .filter(s => s.open !== s.close)
             .sort((a, b) => timeToMin(a.open) - timeToMin(b.open));
-
+ 
         if (sessions.length === 0) return { label: "영업 종료", class: "status-closed", next: "정보 없음" };
-
+ 
         for (let i = 0; i < sessions.length; i++) {
             const open = timeToMin(sessions[i].open);
             let close = timeToMin(sessions[i].close);
-            if (close < open) close += 1440; 
+            if (close <= open) close += 1440;
             if (curMin >= open && curMin < close) {
                 return { label: "영업 중", class: "status-open", next: `${sessions[i].label} 마감: ${sessions[i].close}` };
             }
         }
-
+ 
         for (let i = 0; i < sessions.length - 1; i++) {
             const prevClose = timeToMin(sessions[i].close);
             const nextOpen = timeToMin(sessions[i+1].open);
             if (curMin >= prevClose && curMin < nextOpen) {
-                return { label: "브레이크 타임", class: "status-break", next: `${sessions[i+1].label} 오픈: ${sessions[i+1].open}` };
+                return { label: "브레이크", class: "status-break", next: `${sessions[i+1].label} 오픈: ${sessions[i+1].open}` };
             }
         }
-
+ 
         const firstOpen = timeToMin(sessions[0].open);
         if (curMin < firstOpen) {
-            return { label: "영업 준비중", class: "status-closed", next: `${sessions[0].label} 오픈: ${sessions[0].open}` };
+            return { label: "준비중", class: "status-closed", next: `${sessions[0].label} 오픈: ${sessions[0].open}` };
         } else {
-            return { label: "영업 종료", class: "status-closed", next: "오늘 영업 종료" };
+            return { label: "영업 종료", class: "status-closed", next: "영업 종료" };
         }
     }
-
-    async function init() {
+ 
+    function init() {
         const localData = localStorage.getItem('torder_weekly_sessions_v5');
         stores = localData ? JSON.parse(localData) : defaultStores;
         render();
         startClock();
     }
-
+ 
     function render() {
         const grid = document.getElementById('store-grid');
         grid.innerHTML = '';
         const nowDay = new Date().getDay();
-
+ 
         stores.forEach((store, sIdx) => {
             const status = getBusinessStatus(store);
             const cardDay = isEditMode ? editingDay : nowDay;
             const sched = store.weekly[cardDay];
-            
-            // PDF 파일 여부 체크
-            const isPdf = store.url.toLowerCase().endsWith('.pdf') || store.url.includes('/uc?id=') || store.url.includes('drive.google.com');
-
+            const isPdf = store.url.toLowerCase().endsWith('.pdf') || store.url.includes('drive.google.com');
+ 
             const card = document.createElement('div');
-            card.className = `store-card bg-white rounded-[40px] shadow-xl overflow-hidden flex flex-col border border-gray-100 transition-all ${isEditMode ? 'admin-glow' : ''}`;
+            card.className = `store-card bg-white rounded-2xl md:rounded-3xl shadow-sm overflow-hidden flex flex-col border border-gray-100 transition-all ${isEditMode ? 'admin-glow' : ''}`;
             
             card.innerHTML = `
-                <div class="h-64 overflow-hidden relative cursor-pointer" onclick="!isEditMode && openLink('${store.url}', '${store.name}')">
+                <div class="h-32 sm:h-44 md:h-52 overflow-hidden relative cursor-pointer" onclick="!isEditMode && openLink('${store.url}', '${store.name}')">
                     <img src="${store.img}" class="store-img w-full h-full object-cover">
-                    <div class="absolute inset-0 bg-black bg-opacity-20"></div>
-                    <div class="absolute top-6 left-6 px-5 py-2 rounded-full text-xl font-bold shadow-lg ${status.class}">${status.label}</div>
-                    ${isPdf ? `<div class="absolute top-6 right-6 px-4 py-2 bg-red-600 text-white rounded-xl font-bold text-sm shadow-lg">PDF 메뉴</div>` : ''}
+                    <div class="absolute inset-0 bg-black/10"></div>
+                    <div class="absolute top-2 left-2 px-2 py-0.5 rounded-full text-[10px] font-bold shadow ${status.class}">${status.label}</div>
+                    ${isPdf ? `<div class="absolute top-2 right-2 px-1.5 py-0.5 bg-red-600 text-white rounded font-bold text-[9px]">PDF</div>` : ''}
                 </div>
-                <div class="p-8 flex flex-col gap-4">
-                    <h3 class="text-3xl font-bold text-gray-800">${store.name}</h3>
+                <div class="p-3 md:p-5 flex flex-col gap-2">
+                    <h3 class="text-sm md:text-xl font-bold text-gray-800 truncate leading-tight">${store.name}</h3>
                     
                     <div style="display:${isEditMode ? 'none' : 'block'}">
-                        <div class="flex flex-wrap gap-2 mb-3">
-                            ${sched.sessions.filter(s => s.open !== s.close).map(s => 
-                                `<span class="px-3 py-1 bg-gray-100 rounded-lg text-sm text-gray-600 font-bold">${s.label}: ${s.open}-${s.close}</span>`
-                            ).join('')}
-                            ${sched.isOff ? '<span class="text-red-500 font-bold text-lg">정기 휴무</span>' : ''}
+                        <div class="flex flex-wrap gap-1 mb-1">
+                            ${sched.isOff ? '<span class="text-red-500 font-bold text-[10px]">정기 휴무</span>' :
+                                sched.sessions.filter(s => s.open !== s.close).map(s =>
+                                    `<span class="px-1.5 py-0.5 bg-gray-50 rounded text-[9px] text-gray-400 font-bold">${s.open}-${s.close}</span>`
+                                ).join('')
+                            }
                         </div>
-                        <p class="text-2xl font-black text-slate-700">${status.next}</p>
+                        <p class="text-[11px] md:text-sm font-bold text-slate-500 truncate">${status.next}</p>
                     </div>
-
-                    <div style="display:${isEditMode ? 'block' : 'none'}">
-                        <div class="flex justify-between mb-4 bg-gray-50 p-2 rounded-xl">
+ 
+                    <!-- Edit Panel (Reduced size for grid) -->
+                    <div style="display:${isEditMode ? 'block' : 'none'}" class="text-[10px]">
+                        <div class="flex overflow-x-auto gap-1 mb-2 pb-1 hide-scrollbar">
                             ${weekDays.map((d, i) => `<div class="day-tab ${editingDay == i ? 'active' : ''}" onclick="changeEditDay(${i})">${d}</div>`).join('')}
                         </div>
-                        <div class="space-y-3 p-4 bg-slate-50 rounded-2xl border border-slate-200">
-                            <div class="flex items-center justify-between px-2 mb-1">
-                                <span class="text-lg font-bold text-gray-700">${weekDays[editingDay]}요일 설정</span>
-                                <label class="flex items-center gap-2 cursor-pointer">
-                                    <input type="checkbox" ${sched.isOff ? 'checked' : ''} onchange="updateWeekly(${sIdx}, ${editingDay}, 'isOff', this.checked)">
-                                    <span class="text-sm font-bold text-red-500">휴무</span>
-                                </label>
-                            </div>
+                        <div class="space-y-2 p-2 bg-slate-50 rounded-lg border border-slate-200">
+                            <label class="flex items-center gap-1 cursor-pointer">
+                                <input type="checkbox" ${sched.isOff ? 'checked' : ''} onchange="updateWeekly(${sIdx}, ${editingDay}, 'isOff', this.checked)">
+                                <span class="font-bold text-red-500">휴무</span>
+                            </label>
                             ${sched.sessions.map((sess, sessIdx) => `
-                                <div class="${sched.isOff ? 'opacity-30 pointer-events-none' : ''} grid grid-cols-3 gap-2 items-end border-b pb-2 last:border-0">
-                                    <div><label class="text-[10px] font-bold text-gray-400">구분</label><input type="text" class="w-full p-1 border rounded text-xs" value="${sess.label}" onchange="updateSession(${sIdx}, ${editingDay}, ${sessIdx}, 'label', this.value)"></div>
-                                    <div><label class="text-[10px] font-bold text-gray-400">오픈</label><input type="text" class="w-full p-1 border rounded text-xs font-bold" value="${sess.open}" onchange="updateSession(${sIdx}, ${editingDay}, ${sessIdx}, 'open', this.value)"></div>
-                                    <div><label class="text-[10px] font-bold text-gray-400">마감</label><input type="text" class="w-full p-1 border rounded text-xs font-bold" value="${sess.close}" onchange="updateSession(${sIdx}, ${editingDay}, ${sessIdx}, 'close', this.value)"></div>
+                                <div class="${sched.isOff ? 'opacity-30 pointer-events-none' : ''} grid grid-cols-2 gap-1 border-b border-gray-100 pb-1">
+                                    <input type="text" class="p-0.5 border rounded text-[9px] font-bold" value="${sess.open}" onchange="updateSession(${sIdx}, ${editingDay}, ${sessIdx}, 'open', this.value)">
+                                    <input type="text" class="p-0.5 border rounded text-[9px] font-bold" value="${sess.close}" onchange="updateSession(${sIdx}, ${editingDay}, ${sessIdx}, 'close', this.value)">
                                 </div>
                             `).join('')}
-                            <div class="pt-2">
-                                <label class="text-xs font-bold text-gray-400">메뉴 링크 (URL/PDF)</label>
-                                <input type="text" class="w-full p-2 border rounded-lg text-xs" value="${store.url}" onchange="updateStoreField(${sIdx}, 'url', this.value)">
-                            </div>
-                            <div class="pt-2">
-                                <label class="text-xs font-bold text-gray-400">이미지 URL</label>
-                                <input type="text" class="w-full p-2 border rounded-lg text-xs" value="${store.img}" onchange="updateStoreField(${sIdx}, 'img', this.value)">
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -275,74 +292,47 @@
             grid.appendChild(card);
         });
     }
-
+ 
     function changeEditDay(day) { editingDay = day; render(); }
-
-    function updateWeekly(sIdx, day, field, value) {
-        stores[sIdx].weekly[day][field] = value;
-        localStorage.setItem('torder_weekly_sessions_v5', JSON.stringify(stores));
-        render();
-    }
-
-    function updateSession(sIdx, day, sessIdx, field, value) {
-        stores[sIdx].weekly[day].sessions[sessIdx][field] = value;
-        localStorage.setItem('torder_weekly_sessions_v5', JSON.stringify(stores));
-        render();
-    }
-
-    function updateStoreField(sIdx, field, value) {
-        stores[sIdx][field] = value;
-        localStorage.setItem('torder_weekly_sessions_v5', JSON.stringify(stores));
-        render();
-    }
-
+    function updateWeekly(sIdx, day, field, value) { stores[sIdx].weekly[day][field] = value; localStorage.setItem('torder_weekly_sessions_v5', JSON.stringify(stores)); render(); }
+    function updateSession(sIdx, day, sessIdx, field, value) { stores[sIdx].weekly[day].sessions[sessIdx][field] = value; localStorage.setItem('torder_weekly_sessions_v5', JSON.stringify(stores)); render(); }
+    function updateStoreField(sIdx, field, value) { stores[sIdx][field] = value; localStorage.setItem('torder_weekly_sessions_v5', JSON.stringify(stores)); render(); }
+ 
     function unlockAdmin() {
         if (isAdmin) { isAdmin = false; isEditMode = false; document.getElementById('edit-toggle').classList.add('hidden'); document.getElementById('admin-lock-btn').classList.remove('bg-[#800020]', 'text-white'); render(); }
         else { document.getElementById('pwd-modal').classList.remove('hidden'); document.getElementById('admin-pwd').focus(); }
     }
-
+ 
     function verifyAdmin() {
         if (document.getElementById('admin-pwd').value === ADMIN_PASSWORD) { isAdmin = true; document.getElementById('edit-toggle').classList.remove('hidden'); document.getElementById('admin-lock-btn').classList.add('bg-[#800020]', 'text-white'); closePwdModal(); render(); }
-        else { alert("비밀번호 불일치"); }
+        else { alert("PIN 번호가 올바르지 않습니다."); }
     }
-
+ 
     function closePwdModal() { document.getElementById('pwd-modal').classList.add('hidden'); document.getElementById('admin-pwd').value = ''; }
-
-    function toggleEditMode() {
-        isEditMode = !isEditMode;
-        document.getElementById('edit-toggle').innerText = isEditMode ? "✅ 저장 완료" : "🛠️ 수정 모드";
-        render();
-    }
-
+    function toggleEditMode() { isEditMode = !isEditMode; document.getElementById('edit-toggle').innerText = isEditMode ? "✅ Save" : "🛠️ Edit"; render(); }
+ 
     function openLink(url, title) {
         let targetUrl = url;
-        
-        // 구글 드라이브 PDF를 임베디드 뷰어로 변환하는 로직
         if (url.includes('drive.google.com')) {
             const fileId = url.split('/d/')[1]?.split('/')[0] || url.split('id=')[1]?.split('&')[0];
-            if (fileId) {
-                targetUrl = `https://docs.google.com/viewer?url=https://drive.google.com/uc?id=${fileId}&embedded=true`;
-            }
+            if (fileId) targetUrl = `https://docs.google.com/viewer?url=https://drive.google.com/uc?id=${fileId}&embedded=true`;
         }
-
-        document.getElementById('menu-screen').style.display = 'none';
-        document.getElementById('iframe-container').style.display = 'block';
+        document.getElementById('iframe-container').style.display = 'flex';
         document.getElementById('content-iframe').src = targetUrl;
-        document.getElementById('back-btn').classList.remove('hidden');
-        document.getElementById('app-title').innerText = title;
+        document.getElementById('viewer-title').innerText = title;
+        document.body.style.overflow = 'hidden';
     }
-
+ 
     function goBack() {
         document.getElementById('content-iframe').src = '';
         document.getElementById('iframe-container').style.display = 'none';
-        document.getElementById('menu-screen').style.display = 'block';
-        document.getElementById('back-btn').classList.add('hidden');
-        document.getElementById('app-title').innerText = "T-order Menu Hub";
+        document.body.style.overflow = 'auto';
         render();
     }
-
-    init();
+ 
+    window.onload = init;
 </script>
-
+ 
 </body>
 </html>
+ 
