@@ -6,7 +6,7 @@
     <title>Grand Hyatt T-order Hub</title>
     <meta name="theme-color" content="#800020">
     
-    <!-- PWA 앱 아이콘 설정 -->
+    <!-- PWA 앱 아이콘 설정 (웹 호스팅 경로에 맞춰 이미지를 업로드하세요) -->
     <link rel="apple-touch-icon" href="/icon-192x192.png">
     <link rel="manifest" href="/manifest.json">
     
@@ -78,15 +78,15 @@
 <body>
 
 <div id="loading-spinner" class="loading-overlay">
-    <div class="flex flex-col items-center gap-4">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-4 border-[#800020]"></div>
-        <p id="loading-text" class="text-sm font-bold text-gray-500">데이터 동기화 중...</p>
+    <div class="flex flex-col items-center gap-4 text-center">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-4 border-[#800020] mx-auto"></div>
+        <p id="loading-text" class="text-sm font-bold text-gray-500">초기화 중...</p>
     </div>
 </div>
 
 <div id="app-shell">
     <header class="sticky top-0 bg-white/90 backdrop-blur-md flex items-center justify-between px-4 py-3 border-b border-gray-100 z-30 shadow-sm relative">
-        <!-- 왼쪽: 로고 이미지 (실제 사용하실 이미지 URL로 src를 변경하세요) -->
+        <!-- 왼쪽: 로고 이미지 -->
         <div class="flex items-center w-1/3">
             <img src="https://i.postimg.cc/05bh80xp/GH.png" alt="Grand Hyatt Logo" class="h-8 md:h-12 w-auto object-contain">
         </div>
@@ -113,11 +113,11 @@
     </main>
 
     <div id="iframe-container">
-        <!-- 뷰어 상단 바 (배경색 동적 변경 영역) -->
+        <!-- 뷰어 상단 바 -->
         <div id="viewer-header" class="h-14 bg-white border-b flex items-center justify-between px-4 shrink-0 shadow-sm transition-colors">
             <button id="back-btn" class="flex items-center gap-1.5 px-3 py-2 bg-slate-800 text-white rounded-xl font-bold text-xs" onclick="window.goBack()">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" /></svg>
-                뒤로
+                Back
             </button>
             <span id="viewer-title" class="font-bold text-slate-700 truncate max-w-[150px] text-sm text-center flex-1 mx-2">Menu</span>
             <button id="outlink-btn" class="p-2 bg-slate-800 text-white rounded-xl font-bold text-xs" onclick="window.open(window.currentOpenUrl, '_blank')">
@@ -130,7 +130,7 @@
 
 <div id="pwd-modal" class="hidden fixed inset-0 bg-black/80 z-[110] flex items-center justify-center p-6">
     <div class="bg-white p-8 rounded-3xl shadow-2xl text-center w-full max-w-xs border border-slate-200">
-        <h3 class="text-xl font-bold mb-6 text-slate-800">관리자 인증</h3>
+        <h3 class="text-xl font-bold mb-6 text-slate-800">Admin</h3>
         <input type="password" id="admin-pwd" class="w-full p-4 border-2 border-slate-100 rounded-2xl text-2xl text-center outline-none focus:border-[#800020] bg-slate-50 mb-6" placeholder="PIN" inputmode="numeric">
         <div class="flex gap-2">
             <button class="flex-1 py-3 bg-slate-100 rounded-xl font-bold text-slate-500" onclick="window.closePwdModal()">취소</button>
@@ -145,9 +145,8 @@
     import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     // ---------------------------------------------------------
-    // 시스템 변수 체크 및 초기화 (에러 수정 완료)
+    // 시스템 변수 및 인증 로직 수정
     // ---------------------------------------------------------
-    // 고객님의 진짜 파이어베이스 설정값 적용 완료
     const firebaseConfig = {
         apiKey: "AIzaSyD916tDwoQeKtP4MQMFdKnsC2AGnOkzYBI",
         authDomain: "grand-hyatt-jeju-menu.firebaseapp.com",
@@ -158,10 +157,9 @@
         measurementId: "G-B2K4WV3N0C"
     };
 
-    // appId 문법 에러 수정
     const appId = typeof __app_id !== 'undefined' && __app_id ? __app_id : 'grand-hyatt-jeju-menu';
     const weekDays = ['일', '월', '화', '수', '목', '금', '토'];
-    const ADMIN_PASSWORD = '1234';
+    const ADMIN_PASSWORD = '0520';
 
     window.stores = [];
     window.isEditMode = false;
@@ -175,73 +173,77 @@
         return t;
     };
 
-    // 층수(floor) 및 상단바 색상(themeColor) 속성 추가된 기본 데이터 (오프라인/초기 로딩용)
     const defaultStores = [
         { id: 1, name: "Gallery Lounge", floor: "L1", themeColor: "#463B33", url: "https://edit.istay.io/viewer/index.html?site=fbgal#/ko/store/984d8fc9-d58a-4bcf-aed8-1d803a1b32ed/3790ozmo", img: "https://i.postimg.cc/HkLjfYLF/gaelleolilaunji.jpg", weekly: createWeeklyTemplate() },
-        { id: 2, name: "99Valley", floor: "L2", themeColor: "#ffffff", url: "https://edit.istay.io/viewer/index.html?site=fb99v#/ko/store/e1635994-e41a-46ca-99bd-08895789001c/7734hio1", img: "https://i.postimg.cc/q7c4BfWJ/99-Valley.jpg", weekly: createWeeklyTemplate() },
-        { id: 3, name: "Noknamu", floor: "L3", themeColor: "#ffffff", url: "https://edit.istay.io/viewer/index.html?site=fbnox#/ko/store/3c677ff1-c1c5-4574-8d60-048496ea1cfa/8481tevr", img: "https://i.postimg.cc/XJXHHdfg/nognamu.jpg", weekly: createWeeklyTemplate() },
-        { id: 4, name: "China House", floor: "L3", themeColor: "#ffffff", url: "https://edit.istay.io/viewer/index.html?site=fbchh#/ko/store/c46b6223-3bec-4fdc-99af-c528378cda08/3295bslj", img: "https://i.postimg.cc/263cchQt/chaina-hauseu.jpg", weekly: createWeeklyTemplate() },
-        { id: 5, name: "Jeju Hotpot", floor: "L3", themeColor: "#ffffff", url: "https://edit.istay.io/viewer/index.html?site=fbpot#/ko/store/1158ec0a-7ecf-4a5c-a487-1771f53f3502/483150kk", img: "https://i.postimg.cc/B6tYYHTd/haspas.jpg", weekly: createWeeklyTemplate() },
-        { id: 6, name: "Dream Food Court", floor: "L3", themeColor: "#ffffff", url: "https://www.jejudreamtower.com/upload/file/fileresource/2404/17614.pdf", img: "https://i.postimg.cc/ydWQQcmj/deulim-pudeukoteu.jpg", weekly: createWeeklyTemplate() },
-        { id: 7, name: "Yumeyama", floor: "L4", themeColor: "#ffffff", url: "https://edit.istay.io/viewer/index.html?site=fbyum#/ko/store/d3a3203c-c733-49e0-a395-7109edb5c528/7560zc5b", img: "https://i.postimg.cc/76bss03W/yumeyama.jpg", weekly: createWeeklyTemplate() },
-        { id: 8, name: "Deli", floor: "L4", themeColor: "#ffffff", url: "https://www.jejudreamtower.com/upload/file/fileresource/959/17523.pdf", img: "https://i.postimg.cc/Kz4qqBPD/delli.jpg", weekly: createWeeklyTemplate() },
-        { id: 9, name: "Grand Kitchen", floor: "L4", themeColor: "#ffffff", url: "https://www.jejudreamtower.com/upload/file/fileresource/966/17619.pdf", img: "https://i.postimg.cc/MG93mdQt/geulaendeu-kichin.jpg", weekly: createWeeklyTemplate() },
-        { id: 10, name: "The 88", floor: "L8", themeColor: "#ffffff", url: "https://edit.istay.io/viewer/index.html?site=fbcaf#/ko/store/c11f69b7-2b3f-44d8-a767-938340977a33/1265f4rr", img: "https://i.postimg.cc/LsxQ3N1y/deo-88.jpg", weekly: createWeeklyTemplate() },
-        { id: 11, name: "The 88 Terrace", floor: "L8", themeColor: "#ffffff", url: "https://edit.istay.io/viewer/index.html?site=fbcaf#/ko/store/c88f0b25-462a-470d-a86e-52c3a2f1fac0/6704y042", img: "https://i.postimg.cc/k5TYvfbf/deo-88-telaseu.jpg", weekly: createWeeklyTemplate() },
-        { id: 12, name: "Lounge 38", floor: "L38", themeColor: "#ffffff", url: "https://edit.istay.io/viewer/index.html?site=fbl38#/ko/store/2db5dc63-bd21-4244-8892-fb3eca8f5e8d/4809kmhi", img: "https://i.postimg.cc/TwbM4V0Y/launji-38.jpg", weekly: createWeeklyTemplate() },
-        { id: 13, name: "Blue Dragon", floor: "L38", themeColor: "#ffffff", url: "https://edit.istay.io/viewer/index.html?site=fbbdg#/ko/store/ef3b1278-b47c-49e6-aa8b-d2ca2746c32c/86042d2h", img: "https://i.postimg.cc/9Mz88Zd8/beulludeulaegon.jpg", weekly: createWeeklyTemplate() },
-        { id: 14, name: "Pocha", floor: "L38", themeColor: "#ffffff", url: "https://edit.istay.io/viewer/index.html?site=fbcha#/ko/store/85ac8f34-f6af-4e1a-9561-10c277c8e7e1/5699dovg", img: "https://i.postimg.cc/vBDqqfrj/pocha.jpg", weekly: createWeeklyTemplate() }
+        { id: 2, name: "99Valley", floor: "L2", themeColor: "#82611c", url: "https://edit.istay.io/viewer/index.html?site=fb99v#/ko/store/e1635994-e41a-46ca-99bd-08895789001c/7734hio1", img: "https://i.postimg.cc/q7c4BfWJ/99-Valley.jpg", weekly: createWeeklyTemplate() },
+        { id: 3, name: "Noknamu", floor: "L3", themeColor: "#453422", url: "https://edit.istay.io/viewer/index.html?site=fbnox#/ko/store/3c677ff1-c1c5-4574-8d60-048496ea1cfa/8481tevr", img: "https://i.postimg.cc/XJXHHdfg/nognamu.jpg", weekly: createWeeklyTemplate() },
+        { id: 4, name: "China House", floor: "L3", themeColor: "#7c1818", url: "https://edit.istay.io/viewer/index.html?site=fbchh#/ko/store/c46b6223-3bec-4fdc-99af-c528378cda08/3295bslj", img: "https://i.postimg.cc/263cchQt/chaina-hauseu.jpg", weekly: createWeeklyTemplate() },
+        { id: 5, name: "Jeju Hotpot", floor: "L3", themeColor: "#820002", url: "https://edit.istay.io/viewer/index.html?site=fbpot#/ko/store/1158ec0a-7ecf-4a5c-a487-1771f53f3502/483150kk", img: "https://i.postimg.cc/B6tYYHTd/haspas.jpg", weekly: createWeeklyTemplate() },
+        { id: 6, name: "Dream Food Court", floor: "L3", themeColor: "#ef942d", url: "https://www.jejudreamtower.com/upload/file/fileresource/2404/17614.pdf", img: "https://i.postimg.cc/ydWQQcmj/deulim-pudeukoteu.jpg", weekly: createWeeklyTemplate() },
+        { id: 7, name: "Grand Kitchen", floor: "L4", themeColor: "#5e5047", url: "https://www.jejudreamtower.com/upload/file/fileresource/966/17619.pdf", img: "https://i.postimg.cc/MG93mdQt/geulaendeu-kichin.jpg", weekly: createWeeklyTemplate() },
+        { id: 8, name: "Deli", floor: "L4", themeColor: "#90b2af", url: "https://www.jejudreamtower.com/upload/file/fileresource/959/17523.pdf", img: "https://i.postimg.cc/Kz4qqBPD/delli.jpg", weekly: createWeeklyTemplate() },
+        { id: 9, name: "Yumeyama", floor: "L4", themeColor: "#031d42", url: "https://edit.istay.io/viewer/index.html?site=fbyum#/ko/store/d3a3203c-c733-49e0-a395-7109edb5c528/7560zc5b", img: "https://i.postimg.cc/76bss03W/yumeyama.jpg", weekly: createWeeklyTemplate() },
+        { id: 10, name: "The 88", floor: "L8", themeColor: "#8dad21", url: "https://edit.istay.io/viewer/index.html?site=fbcaf#/ko/store/c11f69b7-2b3f-44d8-a767-938340977a33/1265f4rr", img: "https://i.postimg.cc/LsxQ3N1y/deo-88.jpg", weekly: createWeeklyTemplate() },
+        { id: 11, name: "The 88 Terrace", floor: "L8", themeColor: "#8dad21", url: "https://edit.istay.io/viewer/index.html?site=fbcaf#/ko/store/c88f0b25-462a-470d-a86e-52c3a2f1fac0/6704y042", img: "https://i.postimg.cc/k5TYvfbf/deo-88-telaseu.jpg", weekly: createWeeklyTemplate() },
+        { id: 12, name: "Lounge 38", floor: "L38", themeColor: "#77582c", url: "https://edit.istay.io/viewer/index.html?site=fbl38#/ko/store/2db5dc63-bd21-4244-8892-fb3eca8f5e8d/4809kmhi", img: "https://i.postimg.cc/TwbM4V0Y/launji-38.jpg", weekly: createWeeklyTemplate() },
+        { id: 13, name: "Blue Dragon", floor: "L8", themeColor: "#031d42", url: "https://edit.istay.io/viewer/index.html?site=fbbdg#/ko/store/ef3b1278-b47c-49e6-aa8b-d2ca2746c32c/86042d2h", img: "https://i.postimg.cc/9Mz88Zd8/beulludeulaegon.jpg", weekly: createWeeklyTemplate() },
+        { id: 14, name: "Pocha", floor: "L38", themeColor: "#c23c61", url: "https://edit.istay.io/viewer/index.html?site=fbcha#/ko/store/85ac8f34-f6af-4e1a-9561-10c277c8e7e1/5699dovg", img: "https://i.postimg.cc/vBDqqfrj/pocha.jpg", weekly: createWeeklyTemplate() },
     ];
 
     async function init() {
         startClock();
         
-        // 1. 화면에 HTML 코드로 작성된 기본 데이터를 먼저 빠르게 그려줍니다.
         window.stores = [...defaultStores];
         render();
 
         if (!firebaseConfig) {
-            console.log("파이어베이스 설정이 없습니다. 기본 데이터(로컬) 모드로 실행됩니다.");
             setTimeout(hideSpinner, 500);
             return;
         }
 
-        // 2. 파이어베이스가 연결되어 있다면 인증 및 데이터 동기화를 시작합니다.
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
         try {
             document.getElementById('loading-text').innerText = "보안 인증 중...";
+            let isAuthSuccess = false;
+            
+            // 캔버스 환경이 발급한 토큰이 외부 프로젝트(고객님 DB)와 충돌하는 것을 방지
             if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                await signInWithCustomToken(auth, __initial_auth_token);
-            } else {
+                try {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                    isAuthSuccess = true;
+                } catch(tokenErr) {
+                    console.warn("고객님의 자체 파이어베이스 설정 사용으로 인해 익명 로그인으로 자동 전환합니다.");
+                }
+            } 
+            
+            if (!isAuthSuccess) {
                 await signInAnonymously(auth);
             }
         } catch (e) {
-            console.error("인증 실패. 오프라인 모드로 계속합니다.");
-            hideSpinner();
+            console.error("인증 실패. 파이어베이스 콘솔에서 '익명(Anonymous)' 로그인이 켜져 있는지 확인하세요.", e);
+            document.getElementById('loading-text').innerHTML = "<span class='text-red-500'>인증 실패 (오프라인 모드)</span><br><span class='text-[10px] text-gray-500 mt-2 block'>Firebase 콘솔 > Authentication 에서<br>'익명 로그인'을 켜주세요.</span>";
+            setTimeout(hideSpinner, 5000);
+            return;
         }
 
         onAuthStateChanged(auth, (user) => {
-            if (!user) return; // 인증되지 않으면 진행 불가
+            if (!user) return;
             document.getElementById('loading-text').innerText = "데이터 동기화 중...";
 
             const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'storeConfigs', 'main');
             
-            // 3. 클라우드에서 실시간으로 데이터를 가져옵니다. 
-            // 클라우드에 데이터가 있으면 화면의 기본값을 클라우드 데이터로 덮어씌웁니다.
             onSnapshot(docRef, (docSnap) => {
                 if (docSnap.exists()) {
                     const dbData = docSnap.data().stores;
                     window.stores = dbData.map((s, i) => ({
                         ...s,
-                        // 구버전 데이터 호환성을 위해 층수와 색상 필드가 없으면 기본값을 넣어줌
                         floor: s.floor || defaultStores[i]?.floor || '',
                         themeColor: s.themeColor || defaultStores[i]?.themeColor || '#ffffff'
                     }));
                 } else {
-                    // 최초 실행 시 HTML의 기본 데이터를 클라우드에 업로드합니다.
                     setDoc(docRef, { stores: defaultStores });
                 }
                 render();
@@ -252,7 +254,6 @@
             });
         });
 
-        // 4. "수정" 버튼으로 내용을 변경할 때마다 클라우드로 데이터를 쏴주는 함수입니다.
         window.saveToCloud = async () => {
             if (!auth.currentUser) return;
             const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'storeConfigs', 'main');
@@ -272,7 +273,6 @@
             const now = new Date();
             const dayIdx = now.getDay();
             
-            // 요일별 색상 처리
             let dayColor = "text-slate-400";
             if (dayIdx === 0) dayColor = "text-red-500";
             else if (dayIdx === 6) dayColor = "text-blue-500";
@@ -294,61 +294,54 @@
         const now = new Date();
         const curMin = now.getHours() * 60 + now.getMinutes();
         const nowDay = now.getDay();
-        const prevDay = (nowDay + 6) % 7; // 어제의 요일 계산
+        const prevDay = (nowDay + 6) % 7; 
 
         const todaySched = store.weekly[nowDay];
         const prevSched = store.weekly[prevDay];
 
-        // 1. 어제 스케줄에서 자정을 넘긴 영업이 지금(새벽)도 진행 중인지 확인
         if (prevSched && !prevSched.isOff) {
             const prevSessions = (prevSched.sessions || []).filter(s => s.open !== s.close);
             for (let s of prevSessions) {
                 let open = timeToMin(s.open);
                 let close = timeToMin(s.close);
-                // 어제 오픈 시간보다 마감 시간이 작으면 (자정을 넘겼다면) && 아직 마감 시간 전이라면
                 if (close <= open && curMin < close) {
-                    return { label: "영업 중", class: "status-open", next: `${s.label} 마감: ${s.close}` };
+                    return { label: "Open", class: "status-open", next: `${s.label} 마감: ${s.close}` };
                 }
             }
         }
 
-        // 2. 오늘 정기 휴무인지 확인
-        if (!todaySched || todaySched.isOff) return { label: "정기 휴무", class: "status-off", next: "내일 확인" };
+        if (!todaySched || todaySched.isOff) return { label: "Off", class: "status-off", next: "내일 확인" };
         
         const sessions = (todaySched.sessions || []).filter(s => s.open !== s.close).sort((a, b) => timeToMin(a.open) - timeToMin(b.open));
         if (sessions.length === 0) return { label: "정보 없음", class: "status-closed", next: "영업 시간 설정 필요" };
 
-        // 3. 오늘 스케줄상 현재가 영업 중인지 확인
         for (let i = 0; i < sessions.length; i++) {
             let open = timeToMin(sessions[i].open);
             let close = timeToMin(sessions[i].close);
             let actualClose = close <= open ? close + 1440 : close; 
             
             if (curMin >= open && curMin < actualClose) {
-                return { label: "영업 중", class: "status-open", next: `${sessions[i].label} 마감: ${sessions[i].close}` };
+                return { label: "Open", class: "status-open", next: `${sessions[i].label} 마감: ${sessions[i].close}` };
             }
         }
 
-        // 4. 영업 중이 아니라면 언제인지 세분화 (준비중 / 브레이크 / 영업종료)
         let firstOpen = timeToMin(sessions[0].open);
         if (curMin < firstOpen) {
-            return { label: "영업 준비중", class: "status-break", next: `오픈: ${sessions[0].open}` };
+            return { label: "Ready", class: "status-break", next: `오픈: ${sessions[0].open}` };
         }
 
         for (let i = 0; i < sessions.length - 1; i++) {
             let currentClose = timeToMin(sessions[i].close);
             let nextOpen = timeToMin(sessions[i+1].open);
             
-            // 현재 세션이 자정을 넘기지 않았을 때만 당일 브레이크 타임 계산
             if (currentClose <= timeToMin(sessions[i].open)) currentClose += 1440; 
             
             if (curMin >= currentClose && curMin < nextOpen) {
-                return { label: "브레이크", class: "status-break", next: `재오픈: ${sessions[i+1].open}` };
+                return { label: "Break", class: "status-break", next: `재오픈: ${sessions[i+1].open}` };
             }
         }
 
-        // 모든 조건에 안 맞으면 (마지막 영업이 끝난 이후)
-        return { label: "영업 종료", class: "status-closed", next: "영업 종료" };
+        return { label: "Closed", class: "status-closed", next: "영업 종료" };
     }
 
     function render() {
@@ -377,7 +370,7 @@
                 </div>
                 <div class="p-4 flex flex-col gap-1">
                     <h3 class="text-sm md:text-base font-bold text-slate-800 truncate leading-tight flex items-center gap-1.5">
-                        <span class="px-2 py-0.5 bg-slate-800 text-white rounded-md text-[10px] font-bold shrink-0 shadow-sm">${store.floor || '-'}</span>
+                        <span class="w-1/2 p-1.5 border rounded-lg text-[10px] font-bold shrink-0 shadow-sm">${store.floor || '-'}</span>
                         ${store.name}
                     </h3>
                     <div style="display:${window.isEditMode ? 'none' : 'block'}">
@@ -391,7 +384,6 @@
                         <p class="text-[11px] font-bold text-slate-500 truncate">${status.next}</p>
                     </div>
                     <div style="display:${window.isEditMode ? 'block' : 'none'}" class="space-y-3 mt-1">
-                        <!-- 층수 및 테마 컬러 수정 란 -->
                         <div class="flex gap-2" onclick="event.stopPropagation()">
                             <input type="text" class="w-1/2 p-1.5 border rounded-lg text-[10px]" value="${store.floor || ''}" onchange="window.updateStoreField(${sIdx}, 'floor', this.value)" placeholder="층수 (예: L3)">
                             <div class="w-1/2 flex items-center gap-1 border rounded-lg px-2 bg-white">
@@ -400,12 +392,10 @@
                             </div>
                         </div>
 
-                        <!-- 요일 탭 -->
                         <div class="flex overflow-x-auto gap-1 pb-1 hide-scrollbar">
                             ${weekDays.map((d, i) => `<div class="day-tab ${window.editingDay == i ? 'active' : ''}" onclick="window.changeDay(${i});event.stopPropagation();">${d}</div>`).join('')}
                         </div>
                         
-                        <!-- 영업시간 수정 란 -->
                         <div class="space-y-2 p-2 bg-slate-50 rounded-xl border border-slate-200">
                             <label class="flex items-center gap-1 cursor-pointer" onclick="event.stopPropagation()">
                                 <input type="checkbox" onchange="window.updateWeekly(${sIdx}, ${window.editingDay}, 'isOff', this.checked)" ${sched.isOff ? 'checked' : ''}>
@@ -422,7 +412,6 @@
                             </div>
                         </div>
                         
-                        <!-- 링크 및 이미지 수정 란 -->
                         <input type="text" class="w-full p-1.5 border rounded-lg text-[9px]" value="${store.url}" onchange="window.updateStoreField(${sIdx}, 'url', this.value)" placeholder="링크" onclick="event.stopPropagation()">
                         <input type="text" class="w-full p-1.5 border rounded-lg text-[9px]" value="${store.img}" onchange="window.updateStoreField(${sIdx}, 'img', this.value)" placeholder="이미지" onclick="event.stopPropagation()">
                     </div>
@@ -450,18 +439,24 @@
     window.closePwdModal = () => { document.getElementById('pwd-modal').classList.add('hidden'); document.getElementById('admin-pwd').value = ''; };
     window.toggleEditMode = () => { window.isEditMode=!window.isEditMode; render(); };
 
-    // 테마 컬러 파라미터 추가
     window.openLink = (url, title, themeColor) => {
-        window.currentOpenUrl = url;
         let targetUrl = url;
-        if (url.includes('drive.google.com')) {
-            const fileId = url.split('/d/')[1]?.split('/')[0] || url.split('id=')[1]?.split('&')[0];
+        
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        if (isMobile && targetUrl.includes('/store/')) {
+            targetUrl = targetUrl.replace('/store/', '/shop/');
+        }
+
+        window.currentOpenUrl = targetUrl;
+        
+        if (targetUrl.includes('drive.google.com')) {
+            const fileId = targetUrl.split('/d/')[1]?.split('/')[0] || targetUrl.split('id=')[1]?.split('&')[0];
             if (fileId) targetUrl = `https://docs.google.com/viewer?url=https://drive.google.com/uc?id=${fileId}&embedded=true`;
         }
-        const isPdf = url.toLowerCase().endsWith('.pdf') || url.includes('drive.google.com');
-        if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent) && isPdf) { window.location.href = targetUrl; return; }
         
-        // 상단 바 색상 동적 변경 (PDF가 아닐 때만 적용)
+        const isPdf = targetUrl.toLowerCase().endsWith('.pdf') || targetUrl.includes('drive.google.com');
+        if (isMobile && isPdf) { window.location.href = targetUrl; return; }
+        
         const header = document.getElementById('viewer-header');
         const titleEl = document.getElementById('viewer-title');
         const backBtn = document.getElementById('back-btn');
@@ -470,16 +465,14 @@
         if (!isPdf && themeColor && themeColor !== '#ffffff') {
             header.style.backgroundColor = themeColor;
             header.style.borderBottomColor = themeColor;
-            titleEl.style.color = '#ffffff'; // 배경색이 들어가면 제목 텍스트는 흰색으로
+            titleEl.style.color = '#ffffff'; 
             
-            // 버튼들 스타일 조정 (배경과 대비되도록)
             backBtn.className = "flex items-center gap-1.5 px-3 py-2 bg-white/20 text-white rounded-xl font-bold text-xs backdrop-blur-sm";
             outlinkBtn.className = "p-2 bg-white/20 text-white rounded-xl font-bold text-xs backdrop-blur-sm";
         } else {
-            // 기본 흰색 테마로 원복
             header.style.backgroundColor = '#ffffff';
-            header.style.borderBottomColor = '#e2e8f0'; // Tailwind border-gray-100
-            titleEl.style.color = '#334155'; // Tailwind text-slate-700
+            header.style.borderBottomColor = '#e2e8f0'; 
+            titleEl.style.color = '#334155'; 
             
             backBtn.className = "flex items-center gap-1.5 px-3 py-2 bg-slate-800 text-white rounded-xl font-bold text-xs";
             outlinkBtn.className = "p-2 bg-slate-800 text-white rounded-xl font-bold text-xs";
