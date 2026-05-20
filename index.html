@@ -419,8 +419,7 @@
             if (!user) return;
             document.getElementById('loading-text').innerText = "데이터 동기화 중...";
 
-            // 💡 데이터 갱신 및 그랜드 키친 첫 화면 짤림 수정을 위해 'main_v17'로 버전을 업그레이드했습니다.
-            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'storeConfigs', 'main_v17');
+            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'storeConfigs', 'main_v18');
             
             onSnapshot(docRef, (docSnap) => {
                 if (docSnap.exists()) {
@@ -447,7 +446,7 @@
 
         window.saveToCloud = async () => {
             if (!auth.currentUser) return;
-            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'storeConfigs', 'main_v17');
+            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'storeConfigs', 'main_v18');
             await setDoc(docRef, { stores: window.stores });
         };
     }
@@ -744,9 +743,9 @@
         const floorText = lang === 'ko' ? '4층' : (lang === 'ja' ? '4階' : (lang === 'zh-CN' || lang === 'zh-TW' ? '4楼' : 'Level 4'));
 
         view.innerHTML = `
-            <!-- 💡 pt-[56px] 를 추가하여 상단 배너에 화면이 가리지 않고 아래서부터 온전히 그려지도록 수정했습니다. -->
-            <div class="w-full h-full overflow-y-auto bg-white flex flex-col pb-24 relative pt-[56px]">
-                <div class="max-w-4xl mx-auto w-full px-5 pt-8 flex flex-col items-center text-center">
+            <!-- 💡 pt-[56px] 를 완전히 제거하고 pt-6로 변경하여 상단 여백을 깔끔하게 없앴습니다. -->
+            <div class="w-full h-full overflow-y-auto bg-white flex flex-col pb-24 relative">
+                <div class="max-w-4xl mx-auto w-full px-5 pt-6 flex flex-col items-center text-center">
                     
                     <div class="mb-6 flex flex-col items-center justify-center w-full overflow-visible">
                         <span class="text-[22px] md:text-2xl font-semibold text-[#6d645e] tracking-[0.3em] leading-normal mb-1 whitespace-nowrap pl-[0.3em]">GRAND</span>
@@ -805,7 +804,6 @@
         document.getElementById('custom-store-view').classList.add('hidden');
         document.getElementById('custom-store-view').style.display = 'none';
         
-        // 💡 PDF 화면은 이전 상태로 완벽 복구
         const iframe = document.getElementById('content-iframe');
         iframe.classList.remove('hidden');
         iframe.style.display = 'block'; 
