@@ -98,14 +98,15 @@
 
 <div id="app-shell">
     <header class="sticky top-0 bg-white/90 backdrop-blur-md flex items-center justify-between px-4 py-3 border-b border-gray-100 z-30 shadow-sm relative">
-        <div class="flex items-center w-1/3">
+        <!-- 💡 Left: 비워두어 좌우 균형을 맞춤 (시계 삭제) -->
+        <div class="w-1/3"></div>
+        
+        <!-- 💡 Center: 로고를 중앙으로 유지 -->
+        <div class="absolute left-1/2 -translate-x-1/2 flex items-center justify-center w-1/3">
             <img src="https://i.postimg.cc/05bh80xp/GH.png" alt="Grand Hyatt Logo" class="h-8 md:h-12 w-auto object-contain cursor-pointer" onclick="window.unlockAdmin()" title="Admin Login">
         </div>
         
-        <div id="digital-clock" class="absolute left-1/2 -translate-x-1/2 text-center w-1/3">
-            <div id="clock-time" class="text-xl md:text-2xl font-black text-slate-800 tabular-nums leading-none tracking-tight">00:00:00</div>
-        </div>
-        
+        <!-- Right: Actions -->
         <div class="flex flex-col items-end justify-center w-1/3 gap-1">
             <div class="flex items-center justify-end gap-1.5">
                 <button onclick="window.openQrModal()" class="p-1.5 border border-slate-200 rounded-lg text-slate-600 bg-white hover:bg-slate-50 transition-colors shadow-sm flex items-center justify-center" title="QR 공유">
@@ -126,7 +127,8 @@
                 </select>
                 <button id="edit-toggle" class="hidden px-2.5 py-1 bg-slate-800 text-white text-[10px] font-bold rounded-lg shadow-sm whitespace-nowrap" onclick="window.toggleEditMode()">🛠️ 수정</button>
             </div>
-            <div id="clock-date" class="text-[9px] md:text-[10px] font-medium text-right leading-none whitespace-nowrap">0000.00.00 <span class="text-slate-400">(요일)</span></div>
+            <!-- 💡 날짜를 우측 하단으로 이동 -->
+            <div id="clock-date" class="text-[9px] md:text-[10px] font-medium text-right leading-none whitespace-nowrap mt-0.5">0000.00.00 <span class="text-slate-400">(요일)</span></div>
         </div>
     </header>
 
@@ -136,7 +138,7 @@
 </div>
 
 <div id="iframe-container">
-    <div id="viewer-header" class="top-0 left-0 w-full h-14 bg-white border-b flex items-center justify-between px-4 z-20 shadow-sm transition-colors shrink-0">
+    <div id="viewer-header" class="top-0 left-0 w-full h-14 bg-white border-b flex items-center justify-between px-4 z-20 shadow-sm transition-colors shrink-0 relative">
         <button id="back-btn" class="flex items-center gap-1.5 px-3 py-2 bg-slate-800 text-white rounded-xl font-bold text-xs" onclick="window.goBack()">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" /></svg>
             <span id="back-btn-text">Back</span>
@@ -419,7 +421,7 @@
             if (!user) return;
             document.getElementById('loading-text').innerText = "데이터 동기화 중...";
 
-            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'storeConfigs', 'main_v18');
+            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'storeConfigs', 'main_v21');
             
             onSnapshot(docRef, (docSnap) => {
                 if (docSnap.exists()) {
@@ -446,7 +448,7 @@
 
         window.saveToCloud = async () => {
             if (!auth.currentUser) return;
-            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'storeConfigs', 'main_v18');
+            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'storeConfigs', 'main_v21');
             await setDoc(docRef, { stores: window.stores });
         };
     }
@@ -458,7 +460,6 @@
 
     function startClock() {
         const dateEl = document.getElementById('clock-date');
-        const timeEl = document.getElementById('clock-time');
         setInterval(() => {
             const now = new Date();
             const dayIdx = now.getDay();
@@ -467,9 +468,11 @@
             if (dayIdx === 0) dayColor = "text-red-500";
             else if (dayIdx === 6) dayColor = "text-blue-500";
 
-            dateEl.innerHTML = `<span class="text-slate-400">${now.getFullYear()}. ${String(now.getMonth() + 1).padStart(2, '0')}. ${String(now.getDate()).padStart(2, '0')}.</span> <span class="${dayColor} font-bold">(${weekDays[dayIdx]})</span>`;
+            if(dateEl) {
+                dateEl.innerHTML = `<span class="text-slate-400">${now.getFullYear()}. ${String(now.getMonth() + 1).padStart(2, '0')}. ${String(now.getDate()).padStart(2, '0')}.</span> <span class="${dayColor} font-bold">(${weekDays[dayIdx]})</span>`;
+            }
             
-            timeEl.innerText = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+            // 💡 시계 시간 표시는 삭제했지만, 1분마다 상태가 업데이트 되도록 렌더링 호출은 유지
             if (now.getSeconds() === 0) render(); 
         }, 1000);
     }
@@ -582,10 +585,18 @@
             const displayStoreName = store.name;
 
             const card = document.createElement('div');
-            card.className = `store-card bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden flex flex-col ${window.isEditMode ? 'ring-2 ring-[#800020]' : ''}`;
+            // 💡 카드 전체를 클릭 가능하도록 cursor-pointer 적용 및 온클릭 함수 연결
+            card.className = `store-card bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden flex flex-col cursor-pointer transition-transform active:scale-[0.98] hover:shadow-md ${window.isEditMode ? 'ring-2 ring-[#800020]' : ''}`;
+            
+            card.onclick = (e) => {
+                if (!window.isEditMode) {
+                    window.openLink(sIdx);
+                }
+            };
             
             card.innerHTML = `
-                <div class="aspect-video relative cursor-pointer overflow-hidden" onclick="!window.isEditMode && window.openLink(${sIdx})">
+                <!-- 💡 카드 전체 클릭 영역으로 확장되었으므로 기존 이미지 onclick 속성은 제거 -->
+                <div class="aspect-video relative overflow-hidden">
                     <img src="${store.img}" class="w-full h-full object-cover">
                     <div class="absolute inset-0 bg-black/5"></div>
                     <div class="absolute top-2 left-2 flex gap-1">
@@ -743,7 +754,6 @@
         const floorText = lang === 'ko' ? '4층' : (lang === 'ja' ? '4階' : (lang === 'zh-CN' || lang === 'zh-TW' ? '4楼' : 'Level 4'));
 
         view.innerHTML = `
-            <!-- 💡 pt-[56px] 를 완전히 제거하고 pt-6로 변경하여 상단 여백을 깔끔하게 없앴습니다. -->
             <div class="w-full h-full overflow-y-auto bg-white flex flex-col pb-24 relative">
                 <div class="max-w-4xl mx-auto w-full px-5 pt-6 flex flex-col items-center text-center">
                     
@@ -875,13 +885,10 @@
             backBtn.className = "flex items-center gap-1.5 px-3 py-2 bg-slate-800 text-white rounded-xl font-bold text-xs";
         }
 
-        if (isPhone && store.id !== 15 && store.id !== 7) {
-            header.classList.add('absolute');
-            header.classList.remove('relative');
-        } else {
-            header.classList.add('relative');
-            header.classList.remove('absolute');
-        }
+        // 💡 PDF 뷰어 최적화: 기존에 폰에서 상단 배너를 PDF가 가려버리던 원인 코드를 제거했습니다. 
+        // 이제 배너는 늘 위쪽에 안정적으로 자리잡고, 뷰어는 그 아랫공간 전체를 꽉 채우도록 표시됩니다.
+        header.classList.add('relative');
+        header.classList.remove('absolute');
 
         window.mainScrollPos = window.scrollY || document.documentElement.scrollTop;
         document.body.style.position = 'fixed';
