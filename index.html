@@ -68,6 +68,12 @@
             box-sizing: border-box;
         }
 
+        /* 💡 iStay 등 외부 사이트의 중복 배너를 가리기 위해 화면을 위로 당겨 숨기는 특수 클래스 */
+        .istay-shift {
+            margin-top: -56px;
+            height: calc(100% + 56px) !important;
+        }
+
         .status-open { background-color: #22c55e; color: white; }
         .status-break { background-color: #f59e0b; color: white; }
         .status-closed { background-color: #ef4444; color: white; }
@@ -98,7 +104,6 @@
 
 <div id="app-shell">
     <header class="sticky top-0 bg-white/90 backdrop-blur-md flex items-center justify-between px-4 py-3 border-b border-gray-100 z-30 shadow-sm relative">
-        <!-- 💡 Left: QR 공유 버튼 이동 -->
         <div class="flex items-center justify-start w-1/3">
             <button onclick="window.openQrModal()" class="p-1.5 border border-slate-200 rounded-lg text-slate-600 bg-white hover:bg-slate-50 transition-colors shadow-sm flex items-center justify-center" title="QR 공유">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -111,12 +116,10 @@
             </button>
         </div>
         
-        <!-- 💡 Center: 로고를 중앙으로 유지 -->
         <div class="absolute left-1/2 -translate-x-1/2 flex items-center justify-center w-1/3">
             <img src="https://i.postimg.cc/05bh80xp/GH.png" alt="Grand Hyatt Logo" class="h-8 md:h-12 w-auto object-contain cursor-pointer" onclick="window.unlockAdmin()" title="Admin Login">
         </div>
         
-        <!-- Right: Actions -->
         <div class="flex flex-col items-end justify-center w-1/3 gap-1">
             <div class="flex items-center justify-end gap-1.5">
                 <select id="lang-select" onchange="window.changeLang(this.value)" class="p-1 border border-slate-200 rounded-lg text-[10px] font-bold bg-white text-slate-600 outline-none cursor-pointer shadow-sm">
@@ -128,7 +131,6 @@
                 </select>
                 <button id="edit-toggle" class="hidden px-2.5 py-1 bg-slate-800 text-white text-[10px] font-bold rounded-lg shadow-sm whitespace-nowrap" onclick="window.toggleEditMode()">🛠️ 수정</button>
             </div>
-            <!-- 💡 날짜를 우측 하단으로 이동 -->
             <div id="clock-date" class="text-[9px] md:text-[10px] font-medium text-right leading-none whitespace-nowrap mt-0.5">0000.00.00 <span class="text-slate-400">(요일)</span></div>
         </div>
     </header>
@@ -231,11 +233,11 @@
     window.currentLang = detectDeviceLanguage();
 
     const i18n = {
-        'ko': { open: '영업 중', break: '브레이크', closed: '영업 종료', ready: '영업 준비중', off: '정기 휴무', closeAt: '마감', reopenAt: '영업재개', openAt: '오픈', noInfo: '정보 없음', needSetup: '설정 필요', tmrw: '내일', rsv: '예약', inquiry: '문의', order: '문의/주문', backToMenu: '메뉴 목록으로 돌아가기', breakfast: '아침', lunch: '점심', dinner: '저녁', hours24: '24시간 영업', days: ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'], viewMenu: '메뉴 보기', selectAction: '원하시는 항목을 선택해 주세요.', adult: '성인', child: '아동', childAge: '*아동: 만 6세 이상 ~ 12세 이하', locationLabel: '위치', bevMenu: '음료 메뉴 보기', descGK: '마카오 윈팰리스 폰타나 뷔페에서 총괄 셰프로 일한 스타셰프 민이 제주의 제철 재료로 다채로운 글로벌 메뉴를 선보입니다. 10여 가지 육류와 해산물을 즉석에서 구워주는 그릴 스테이션, 신선한 스시와 사시미를 맛볼 수 있는 씨푸드 스테이션 등 7개의 라이브 쿠킹 스테이션에서 미식의 즐거움을 경험하세요.', backBtn: '뒤로', mainPage: '메인 페이지', qrTitle: '페이지 공유', qrDesc: '스마트폰 카메라로 QR 코드를 스캔하세요.', close: '닫기', share: '공유' },
+        'ko': { open: '영업 중', break: '브레이크', closed: '영업 종료', ready: '준비 중', off: '휴무', closeAt: '마감', reopenAt: '재개', openAt: '오픈', noInfo: '정보 없음', needSetup: '설정 필요', tmrw: '내일', rsv: '예약', inquiry: '문의', order: '문의/주문', backToMenu: '메뉴 목록으로 돌아가기', breakfast: '아침', lunch: '점심', dinner: '저녁', hours24: '24시간 영업', days: ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'], viewMenu: '메뉴 보기', selectAction: '원하시는 항목을 선택해 주세요.', adult: '성인', child: '아동', childAge: '*아동: 만 6세 이상 ~ 12세 이하', locationLabel: '위치', bevMenu: '음료 메뉴 보기', descGK: '마카오 윈팰리스 폰타나 뷔페에서 총괄 셰프로 일한 스타셰프 민이 제주의 제철 재료로 다채로운 글로벌 메뉴를 선보입니다. 10여 가지 육류와 해산물을 즉석에서 구워주는 그릴 스테이션, 신선한 스시와 사시미를 맛볼 수 있는 씨푸드 스테이션 등 7개의 라이브 쿠킹 스테이션에서 미식의 즐거움을 경험하세요.', backBtn: '뒤로', mainPage: '메인 페이지', qrTitle: '페이지 공유', qrDesc: '스마트폰 카메라로 QR 코드를 스캔하세요.', close: '닫기', share: '공유' },
         'en': { open: 'Open', break: 'Break', closed: 'Closed', ready: 'Ready', off: 'Off', closeAt: 'Close', reopenAt: 'Reopen', openAt: 'Open', noInfo: 'No Info', needSetup: 'Setup Needed', tmrw: 'Tomorrow', rsv: 'RSVP', inquiry: 'Inquiry', order: 'Order/Inquiry', backToMenu: 'Back to Menu', breakfast: 'Breakfast', lunch: 'Lunch', dinner: 'Dinner', hours24: '24 Hours', days: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'], viewMenu: 'View Menu', selectAction: 'Please select an option.', adult: 'Adult', child: 'Child', childAge: '*Child: 6-12 years old', locationLabel: 'Location', bevMenu: 'View Beverage Menu', descGK: 'Star chef Min, former executive chef at Fontana Buffet in Wynn Palace Macau, presents a diverse global menu using seasonal ingredients from Jeju. Experience gastronomic delight at 7 live cooking stations, including a grill station with over 10 types of meat and seafood roasted on the spot, and a seafood station with fresh sushi and sashimi.', backBtn: 'Back', mainPage: 'Main Page', qrTitle: 'Share Page', qrDesc: 'Scan the QR code with your smartphone camera.', close: 'Close', share: 'Share' },
-        'ja': { open: '営業中', break: '休憩', closed: '営業終了', ready: '準備中', off: '定休日', closeAt: '終了', reopenAt: '営業再開', openAt: '開始', noInfo: '情報なし', needSetup: '設定必要', tmrw: '明日', rsv: '予約', inquiry: 'お問い合わせ', order: 'ご注文/お問い合わせ', backToMenu: 'メニューに戻る', breakfast: '朝食', lunch: '昼食', dinner: '夕食', hours24: '24時間営業', days: ['日曜日', '月曜日', '火曜日', '水曜日', '木曜日', '金曜日', '土曜日'], viewMenu: 'メニューを見る', selectAction: 'ご希望의 項目を選択してください。', adult: '大人', child: '小人', childAge: '※小人：満6歳以上～12歳以下', locationLabel: '場所', bevMenu: 'ドリンクメニューを見る', descGK: 'マカオのウィンパレス「フォンタナビュッフェ」で総料理長を務めたスターシェフ、ミンが、済州の旬の食材を使った多彩なグローバルメニューをお届けします。10種類以上の肉やシーフードを目の前で焼き上げるグリルステーションや、新鮮な寿司や刺身を味わえるシーフードステーションなど、7つのライブクッキングステーションで美食の喜びをご体験ください。', backBtn: '戻る', mainPage: 'メインページ', qrTitle: 'ページ共有', qrDesc: 'スマートフォンのカメラでQRコードをスキャンしてください。', close: '閉じる', share: '共有' },
-        'zh-CN': { open: '营业中', break: '休息', closed: '已打烊', ready: '准备中', off: '休息日', closeAt: '结束', reopenAt: '重新营业', openAt: '开始', noInfo: '无信息', needSetup: '需要设置', tmrw: '明天', rsv: '预订', inquiry: '咨询', order: '点餐/咨询', backToMenu: '返回菜单', breakfast: '早餐', lunch: '午餐', dinner: '晚餐', hours24: '24小时营业', days: ['周日', '周一', '周二', '周三', '周四', '周五', '周六'], viewMenu: '查看菜单', selectAction: '请选择您需要的服务。', adult: '成人', child: '儿童', childAge: '*儿童：满6岁至12岁', locationLabel: '位置', bevMenu: '查看酒水菜单', descGK: '曾在澳门永利皇宫“咖啡苑”担任行政总厨的明星主厨 Min，使用济州应季食材，为您呈现丰富多彩的全球美食。这里有为您现场烤制10余种肉类 and 海鲜的烧烤档、可品尝新鲜寿司和生鱼片的海鲜档等，共有7个现场烹饪台，让您尽享美食之乐。', backBtn: '返回', mainPage: '主页', qrTitle: '分享页面', qrDesc: '请用智能手机相机扫描二维码。', close: '关闭', share: '分享' },
-        'zh-TW': { open: '營業中', break: '休息', closed: '已打烊', ready: '準備中', off: '休息日', closeAt: '結束', reopenAt: '重新營業', openAt: '開始', noInfo: '無資訊', needSetup: '需要設置', tmrw: '明天', rsv: '預訂', inquiry: '諮詢', order: '點餐/諮詢', backToMenu: '返回菜單', breakfast: '早餐', lunch: '午餐', dinner: '晚餐', hours24: '24小時營業', days: ['週日', '週一', '週二', '週三', '週四', '週五', '週六'], viewMenu: '查看菜單', selectAction: '請選擇您需要的服務。', adult: '成人', child: '兒童', childAge: '*兒童：滿6歲至12歲', locationLabel: '位置', bevMenu: '查看酒水菜單', descGK: '曾在澳門永利皇宮「咖啡苑」擔任行政總廚的明星主廚 Min，使用濟州當季食材，為您呈現豐富多彩的全球美食。這裡有為您現場烤製10餘種肉類和海鮮的燒烤區、可品嚐新鮮壽司和生魚片的海鮮區等，共有7個現場烹飪區，讓您盡享美食之樂。', backBtn: '返回', mainPage: '主頁', qrTitle: '分享頁面', qrDesc: '請用智慧型手機相機掃描行動條碼。', close: '關閉', share: '分享' }
+        'ja': { open: '営業中', break: '休憩', closed: '終了', ready: '準備中', off: '休業', closeAt: '終了', reopenAt: '再開', openAt: '開始', noInfo: '情報なし', needSetup: '設定必要', tmrw: '明日', rsv: '予約', inquiry: 'お問い合わせ', order: 'ご注文/お問い合わせ', backToMenu: 'メニューに戻る', breakfast: '朝食', lunch: '昼食', dinner: '夕食', hours24: '24時間営業', days: ['日曜日', '月曜日', '火曜日', '水曜日', '木曜日', '金曜日', '土曜日'], viewMenu: 'メニューを見る', selectAction: 'ご希望의 項目を選択してください。', adult: '大人', child: '小人', childAge: '※小人：満6歳以上～12歳以下', locationLabel: '場所', bevMenu: 'ドリンクメニューを見る', descGK: 'マカオのウィンパレス「フォンタナビュッフェ」で総料理長を務めたスターシェフ、ミンが、済州の旬の食材を使った多彩なグローバルメニューをお届けします。10種類以上の肉やシーフードを目の前で焼き上げるグリルステーションや、新鮮な寿司や刺身を味わえるシーフードステーションなど、7つのライブクッキングステーションで美食の喜びをご体験ください。', backBtn: '戻る', mainPage: 'メインページ', qrTitle: 'ページ共有', qrDesc: 'スマートフォンのカメラでQRコードをスキャンしてください。', close: '閉じる', share: '共有' },
+        'zh-CN': { open: '营业中', break: '休息', closed: '已打烊', ready: '准备中', off: '休息', closeAt: '结束', reopenAt: '重新营业', openAt: '开始', noInfo: '无信息', needSetup: '需要设置', tmrw: '明天', rsv: '预订', inquiry: '咨询', order: '点餐/咨询', backToMenu: '返回菜单', breakfast: '早餐', lunch: '午餐', dinner: '晚餐', hours24: '24小时营业', days: ['周日', '周一', '周二', '周三', '周四', '周五', '周六'], viewMenu: '查看菜单', selectAction: '请选择您需要的服务。', adult: '成人', child: '儿童', childAge: '*儿童：满6岁至12岁', locationLabel: '位置', bevMenu: '查看酒水菜单', descGK: '曾在澳门永利皇宫“咖啡苑”担任行政总厨的明星主厨 Min，使用济州应季食材，为您呈现丰富多彩的全球美食。这里有为您现场烤制10余种肉类 and 海鲜的烧烤档、可品尝新鲜寿司和生鱼片的海鲜档等，共有7个现场烹饪台，让您尽享美食之乐。', backBtn: '返回', mainPage: '主页', qrTitle: '分享页面', qrDesc: '请用智能手机相机扫描二维码。', close: '关闭', share: '分享' },
+        'zh-TW': { open: '營業中', break: '休息', closed: '已打烊', ready: '準備中', off: '休息', closeAt: '結束', reopenAt: '重新營業', openAt: '開始', noInfo: '無資訊', needSetup: '需要設置', tmrw: '明天', rsv: '預訂', inquiry: '諮詢', order: '點餐/諮詢', backToMenu: '返回菜單', breakfast: '早餐', lunch: '午餐', dinner: '晚餐', hours24: '24小時營業', days: ['週日', '週一', '週二', '週三', '週四', '週五', '週六'], viewMenu: '查看菜單', selectAction: '請選擇您需要的服務。', adult: '成人', child: '兒童', childAge: '*兒童：滿6歲至12歲', locationLabel: '位置', bevMenu: '查看酒水菜單', descGK: '曾在澳門永利皇宮「咖啡苑」擔任行政總廚的明星主廚 Min，使用濟州當季食材，為您呈現豐富多彩的全球美食。這裡有為您現場烤製10餘種肉類和海鮮的燒烤區、可品嚐新鮮壽司和生魚片的海鮮區等，共有7個現場烹飪區，讓您盡享美食之樂。', backBtn: '返回', mainPage: '主頁', qrTitle: '分享頁面', qrDesc: '請用智慧型手機相機掃描行動條碼。', close: '關閉', share: '分享' }
     };
 
     const getLabel = (label) => {
@@ -243,11 +245,11 @@
         return i18n[window.currentLang][label] || label;
     };
 
+    const langLabels = { ko: '한국어', en: 'English', 'zh-CN': '간체', 'zh-TW': '번체', ja: '일본어' };
+
     const floorColors = {
         'L1': '#78716c', 'L2': '#A38A59', 'L3': '#8A3A42', 'L4': '#3F4E40', 'L8': '#115E59', 'L38': '#0F172A' 
     };
-
-    const langLabels = { ko: '한국어', en: 'English', 'zh-CN': '간체', 'zh-TW': '번체', ja: '일본어' };
 
     const makeWeekly = (type) => {
         let t = {};
@@ -328,17 +330,35 @@
         },
         { 
             id: 6, name: "Dream Food Court", floor: "L3", themeColor: "#ef942d", phone: "+82 10-7470-0762", img: "https://i.postimg.cc/ydWQQcmj/deulim-pudeukoteu.jpg", weekly: makeWeekly('foodcourt'),
-            urls: { ko: "https://www.jejudreamtower.com/upload/file/fileresource/2403/17613.pdf", en: "https://www.jejudreamtower.com/upload/file/fileresource/2404/17614.pdf", "zh-CN": "https://www.jejudreamtower.com/upload/file/fileresource/2405/17615.pdf", "zh-TW": "https://www.jejudreamtower.com/upload/file/fileresource/2406/17616.pdf", ja: "https://www.jejudreamtower.com/upload/file/fileresource/2407/17617.pdf" },
+            urls: { 
+                ko: "https://www.hyatt.com/content/dam/hotel/propertysites/assets/grand/cjugh/documents/ko_kr/dining/popup-plaza/Dream-Food-Court-Menu-KR.pdf", 
+                en: "https://www.hyatt.com/content/dam/hotel/propertysites/assets/grand/cjugh/documents/en_us/dining/pop-up-plaza/Dream-Food-Court-Menu.pdf", 
+                "zh-CN": "https://www.hyatt.com/content/dam/hotel/propertysites/assets/grand/cjugh/documents/zh_cn/dining/pop-up-plaza/Dream-Food-Court-Menu-SC.pdf", 
+                "zh-TW": "https://www.hyatt.com/content/dam/hotel/propertysites/assets/grand/cjugh/documents/zh_hk/Dream-Food-Court-Menu-TC.pdf", 
+                ja: "https://www.hyatt.com/content/dam/hotel/propertysites/assets/grand/cjugh/documents/ja_jp/dining/pop-up-plaza/Dream-Food-Court-Menu-JP.pdf" 
+            },
             rsvUrls: makeRsvUrls()
         },
         { 
             id: 7, name: "Grand Kitchen", floor: "L4", themeColor: "#5e5047", phone: "+82 10-7470-0769", img: "https://i.postimg.cc/MG93mdQt/geulaendeu-kichin.jpg", weekly: makeWeekly('grandkitchen'),
-            urls: { ko: "https://www.jejudreamtower.com/upload/file/fileresource/965/17618.pdf", en: "https://www.jejudreamtower.com/upload/file/fileresource/966/17619.pdf", "zh-CN": "https://www.jejudreamtower.com/upload/file/fileresource/967/17620.pdf", "zh-TW": "https://www.jejudreamtower.com/upload/file/fileresource/2232/17622.pdf", ja: "https://www.jejudreamtower.com/upload/file/fileresource/1300/17621.pdf" },
+            urls: { 
+                ko: "https://www.hyatt.com/content/dam/hotel/propertysites/assets/grand/cjugh/documents/en_us/dining/grand-kitchen/Grand-Kitchen-Menu-EN.pdf", 
+                en: "https://www.hyatt.com/content/dam/hotel/propertysites/assets/grand/cjugh/documents/en_us/dining/grand-kitchen/Grand-Kitchen-Menu-EN.pdf", 
+                "zh-CN": "https://www.hyatt.com/content/dam/hotel/propertysites/assets/grand/cjugh/documents/zh_cn/dining/grand-kitchen/Grand-Kitchen-Menu-SC.pdf", 
+                "zh-TW": "https://www.hyatt.com/content/dam/hotel/propertysites/assets/grand/cjugh/documents/zh_hk/dining/grand-kitchen/Grand-Kitchen-Menu-TC.pdf", 
+                ja: "https://www.hyatt.com/content/dam/hotel/propertysites/assets/grand/cjugh/documents/ja_jp/dining/grand-kitchen/Grand-Kitchen-Menu-JP.pdf" 
+            },
             rsvUrls: makeTableCheckUrls('grand-kitchen')
         },
         { 
             id: 8, name: "Deli", floor: "L4", themeColor: "#90b2af", phone: "+82 10-7470-0782", img: "https://i.postimg.cc/Kz4qqBPD/delli.jpg", weekly: makeWeekly('deli'),
-            urls: { ko: "https://www.jejudreamtower.com/upload/file/fileresource/959/17523.pdf", en: "https://www.jejudreamtower.com/upload/file/fileresource/960/17524.pdf", "zh-CN": "https://www.jejudreamtower.com/upload/file/fileresource/961/17525.pdf", "zh-TW": "https://www.jejudreamtower.com/upload/file/fileresource/2230/17527.pdf", ja: "https://www.jejudreamtower.com/upload/file/fileresource/2118/17526.pdf" },
+            urls: { 
+                ko: "https://www.hyatt.com/content/dam/hotel/propertysites/assets/grand/cjugh/documents/en_us/dining/deli/Deli-Menu.pdf", 
+                en: "https://www.hyatt.com/content/dam/hotel/propertysites/assets/grand/cjugh/documents/en_us/dining/deli/Deli-Menu.pdf", 
+                "zh-CN": "https://www.hyatt.com/content/dam/hotel/propertysites/assets/grand/cjugh/documents/zh_cn/dining/deli/Deli-Menu-Simplified-Chinese.pdf", 
+                "zh-TW": "https://www.hyatt.com/content/dam/hotel/propertysites/assets/grand/cjugh/documents/zh_hk/dining/deli/Deli-Menu-Traditional-Chinese.pdf", 
+                ja: "https://www.hyatt.com/content/dam/hotel/propertysites/assets/grand/cjugh/documents/ja_jp/dining/deli/Deli-Menu-Japanese.pdf" 
+            },
             rsvUrls: makeRsvUrls()
         },
         { 
@@ -422,7 +442,8 @@
             if (!user) return;
             document.getElementById('loading-text').innerText = "데이터 동기화 중...";
 
-            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'storeConfigs', 'main_v21');
+            // 💡 데이터 갱신을 위해 'main_v23'으로 버전을 업그레이드했습니다.
+            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'storeConfigs', 'main_v23');
             
             onSnapshot(docRef, (docSnap) => {
                 if (docSnap.exists()) {
@@ -449,7 +470,7 @@
 
         window.saveToCloud = async () => {
             if (!auth.currentUser) return;
-            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'storeConfigs', 'main_v21');
+            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'storeConfigs', 'main_v23');
             await setDoc(docRef, { stores: window.stores });
         };
     }
@@ -473,7 +494,6 @@
                 dateEl.innerHTML = `<span class="text-slate-400">${now.getFullYear()}. ${String(now.getMonth() + 1).padStart(2, '0')}. ${String(now.getDate()).padStart(2, '0')}.</span> <span class="${dayColor} font-bold">(${weekDays[dayIdx]})</span>`;
             }
             
-            // 💡 시계 시간 표시는 삭제했지만, 1분마다 상태가 업데이트 되도록 렌더링 호출은 유지
             if (now.getSeconds() === 0) render(); 
         }, 1000);
     }
@@ -586,7 +606,6 @@
             const displayStoreName = store.name;
 
             const card = document.createElement('div');
-            // 💡 카드 전체를 클릭 가능하도록 cursor-pointer 적용 및 온클릭 함수 연결
             card.className = `store-card bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden flex flex-col cursor-pointer transition-transform active:scale-[0.98] hover:shadow-md ${window.isEditMode ? 'ring-2 ring-[#800020]' : ''}`;
             
             card.onclick = (e) => {
@@ -596,7 +615,6 @@
             };
             
             card.innerHTML = `
-                <!-- 💡 카드 전체 클릭 영역으로 확장되었으므로 기존 이미지 onclick 속성은 제거 -->
                 <div class="aspect-video relative overflow-hidden">
                     <img src="${store.img}" class="w-full h-full object-cover">
                     <div class="absolute inset-0 bg-black/5"></div>
@@ -886,10 +904,24 @@
             backBtn.className = "flex items-center gap-1.5 px-3 py-2 bg-slate-800 text-white rounded-xl font-bold text-xs";
         }
 
-        // 💡 PDF 뷰어 최적화: 기존에 폰에서 상단 배너를 PDF가 가려버리던 원인 코드를 제거했습니다. 
-        // 이제 배너는 늘 위쪽에 안정적으로 자리잡고, 뷰어는 그 아랫공간 전체를 꽉 채우도록 표시됩니다.
-        header.classList.add('relative');
-        header.classList.remove('absolute');
+        const iframe = document.getElementById('content-iframe');
+        iframe.classList.remove('istay-shift');
+
+        // 💡 배너 레이아웃 처리 (이중 배너 가리기 로직)
+        if (store.id === 6 || store.id === 8) {
+            header.classList.add('absolute');
+            header.classList.remove('relative');
+        } else if (store.id === 7 || store.id === 15) {
+            header.classList.add('relative');
+            header.classList.remove('absolute');
+        } else {
+            header.classList.add('relative');
+            header.classList.remove('absolute');
+            // 💡 스마트폰일 때만 화면을 올려서 중복 배너를 가리고, 태블릿/PC는 그대로 보여줌
+            if (isPhone) {
+                iframe.classList.add('istay-shift');
+            }
+        }
 
         window.mainScrollPos = window.scrollY || document.documentElement.scrollTop;
         document.body.style.position = 'fixed';
@@ -900,8 +932,6 @@
         document.getElementById('app-shell').style.pointerEvents = 'none'; 
 
         document.getElementById('iframe-container').style.display = 'flex'; 
-        
-        const iframe = document.getElementById('content-iframe');
 
         if (store.id === 7) {
             window.renderGrandKitchen(targetUrl);
@@ -927,6 +957,7 @@
         const iframe = document.getElementById('content-iframe');
         iframe.src = ''; 
         iframe.classList.remove('hidden');
+        iframe.classList.remove('istay-shift'); // 화면 복구 시 이중 배너 숨김 처리도 초기화
         iframe.style.display = 'block'; 
         document.getElementById('custom-store-view').classList.add('hidden');
         document.getElementById('custom-store-view').style.display = 'none';
