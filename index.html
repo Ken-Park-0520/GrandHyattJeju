@@ -330,34 +330,37 @@
         },
         { 
             id: 6, name: "Dream Food Court", floor: "L3", themeColor: "#ef942d", phone: "+82 10-7470-0762", img: "https://i.postimg.cc/ydWQQcmj/deulim-pudeukoteu.jpg", weekly: makeWeekly('foodcourt'),
+            // 💡 드림푸드코트 제주드림타워 링크로 업데이트 완료
             urls: { 
-                ko: "https://www.hyatt.com/content/dam/hotel/propertysites/assets/grand/cjugh/documents/ko_kr/dining/popup-plaza/Dream-Food-Court-Menu-KR.pdf", 
-                en: "https://www.hyatt.com/content/dam/hotel/propertysites/assets/grand/cjugh/documents/en_us/dining/pop-up-plaza/Dream-Food-Court-Menu.pdf", 
-                "zh-CN": "https://www.hyatt.com/content/dam/hotel/propertysites/assets/grand/cjugh/documents/zh_cn/dining/pop-up-plaza/Dream-Food-Court-Menu-SC.pdf", 
-                "zh-TW": "https://www.hyatt.com/content/dam/hotel/propertysites/assets/grand/cjugh/documents/zh_hk/Dream-Food-Court-Menu-TC.pdf", 
-                ja: "https://www.hyatt.com/content/dam/hotel/propertysites/assets/grand/cjugh/documents/ja_jp/dining/pop-up-plaza/Dream-Food-Court-Menu-JP.pdf" 
+                ko: "https://www.jejudreamtower.com/upload/file/fileresource/2403/17665.pdf", 
+                en: "https://www.jejudreamtower.com/upload/file/fileresource/2404/17666.pdf", 
+                "zh-CN": "https://www.jejudreamtower.com/upload/file/fileresource/2405/17667.pdf", 
+                "zh-TW": "https://www.jejudreamtower.com/upload/file/fileresource/2406/17668.pdf", 
+                ja: "https://www.jejudreamtower.com/upload/file/fileresource/2407/17669.pdf" 
             },
             rsvUrls: makeRsvUrls()
         },
         { 
             id: 7, name: "Grand Kitchen", floor: "L4", themeColor: "#5e5047", phone: "+82 10-7470-0769", img: "https://i.postimg.cc/MG93mdQt/geulaendeu-kichin.jpg", weekly: makeWeekly('grandkitchen'),
+            // 💡 그랜드 키친 제주드림타워 링크로 업데이트 완료
             urls: { 
-                ko: "https://www.hyatt.com/content/dam/hotel/propertysites/assets/grand/cjugh/documents/en_us/dining/grand-kitchen/Grand-Kitchen-Menu-EN.pdf", 
-                en: "https://www.hyatt.com/content/dam/hotel/propertysites/assets/grand/cjugh/documents/en_us/dining/grand-kitchen/Grand-Kitchen-Menu-EN.pdf", 
-                "zh-CN": "https://www.hyatt.com/content/dam/hotel/propertysites/assets/grand/cjugh/documents/zh_cn/dining/grand-kitchen/Grand-Kitchen-Menu-SC.pdf", 
-                "zh-TW": "https://www.hyatt.com/content/dam/hotel/propertysites/assets/grand/cjugh/documents/zh_hk/dining/grand-kitchen/Grand-Kitchen-Menu-TC.pdf", 
-                ja: "https://www.hyatt.com/content/dam/hotel/propertysites/assets/grand/cjugh/documents/ja_jp/dining/grand-kitchen/Grand-Kitchen-Menu-JP.pdf" 
+                ko: "https://www.jejudreamtower.com/upload/file/fileresource/965/17618.pdf", 
+                en: "https://www.jejudreamtower.com/upload/file/fileresource/966/17619.pdf", 
+                "zh-CN": "https://www.jejudreamtower.com/upload/file/fileresource/967/17620.pdf", 
+                "zh-TW": "https://www.jejudreamtower.com/upload/file/fileresource/2232/17622.pdf", 
+                ja: "https://www.jejudreamtower.com/upload/file/fileresource/1300/17621.pdf" 
             },
             rsvUrls: makeTableCheckUrls('grand-kitchen')
         },
         { 
             id: 8, name: "Deli", floor: "L4", themeColor: "#90b2af", phone: "+82 10-7470-0782", img: "https://i.postimg.cc/Kz4qqBPD/delli.jpg", weekly: makeWeekly('deli'),
+            // 💡 델리 제주드림타워 링크로 업데이트 완료
             urls: { 
-                ko: "https://www.hyatt.com/content/dam/hotel/propertysites/assets/grand/cjugh/documents/en_us/dining/deli/Deli-Menu.pdf", 
-                en: "https://www.hyatt.com/content/dam/hotel/propertysites/assets/grand/cjugh/documents/en_us/dining/deli/Deli-Menu.pdf", 
-                "zh-CN": "https://www.hyatt.com/content/dam/hotel/propertysites/assets/grand/cjugh/documents/zh_cn/dining/deli/Deli-Menu-Simplified-Chinese.pdf", 
-                "zh-TW": "https://www.hyatt.com/content/dam/hotel/propertysites/assets/grand/cjugh/documents/zh_hk/dining/deli/Deli-Menu-Traditional-Chinese.pdf", 
-                ja: "https://www.hyatt.com/content/dam/hotel/propertysites/assets/grand/cjugh/documents/ja_jp/dining/deli/Deli-Menu-Japanese.pdf" 
+                ko: "https://www.jejudreamtower.com/upload/file/fileresource/959/17660.pdf", 
+                en: "https://www.jejudreamtower.com/upload/file/fileresource/960/17661.pdf", 
+                "zh-CN": "https://www.jejudreamtower.com/upload/file/fileresource/961/17662.pdf", 
+                "zh-TW": "https://www.jejudreamtower.com/upload/file/fileresource/2230/17664.pdf", 
+                ja: "https://www.jejudreamtower.com/upload/file/fileresource/2118/17663.pdf" 
             },
             rsvUrls: makeRsvUrls()
         },
@@ -442,8 +445,8 @@
             if (!user) return;
             document.getElementById('loading-text').innerText = "데이터 동기화 중...";
 
-            // 💡 데이터 갱신을 위해 'main_v23'으로 버전을 업그레이드했습니다.
-            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'storeConfigs', 'main_v23');
+            // 💡 데이터 갱신을 위해 'main_v24'으로 버전을 업그레이드했습니다.
+            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'storeConfigs', 'main_v24');
             
             onSnapshot(docRef, (docSnap) => {
                 if (docSnap.exists()) {
@@ -470,7 +473,7 @@
 
         window.saveToCloud = async () => {
             if (!auth.currentUser) return;
-            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'storeConfigs', 'main_v23');
+            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'storeConfigs', 'main_v24');
             await setDoc(docRef, { stores: window.stores });
         };
     }
@@ -907,7 +910,6 @@
         const iframe = document.getElementById('content-iframe');
         iframe.classList.remove('istay-shift');
 
-        // 💡 배너 레이아웃 처리 (이중 배너 가리기 로직)
         if (store.id === 6 || store.id === 8) {
             header.classList.add('absolute');
             header.classList.remove('relative');
@@ -917,7 +919,6 @@
         } else {
             header.classList.add('relative');
             header.classList.remove('absolute');
-            // 💡 스마트폰일 때만 화면을 올려서 중복 배너를 가리고, 태블릿/PC는 그대로 보여줌
             if (isPhone) {
                 iframe.classList.add('istay-shift');
             }
@@ -957,7 +958,7 @@
         const iframe = document.getElementById('content-iframe');
         iframe.src = ''; 
         iframe.classList.remove('hidden');
-        iframe.classList.remove('istay-shift'); // 화면 복구 시 이중 배너 숨김 처리도 초기화
+        iframe.classList.remove('istay-shift'); 
         iframe.style.display = 'block'; 
         document.getElementById('custom-store-view').classList.add('hidden');
         document.getElementById('custom-store-view').style.display = 'none';
